@@ -1,10 +1,18 @@
 ﻿<script type="text/javascript">
-    @if (string.IsNullOrEmpty(ViewBag.NoHttps))
-    {<text>
+    @if (string.IsNullOrEmpty(ViewBag.NoHttps)){<text>
         document.write('<iframe src="@Html.Raw(ViewBag.AppUrl)" frameborder="0" scrolling="auto" style="width:100%;height:100%;overflow:auto;"></iframe>');
-    </text>}else{<text>    
+    </text>}else{<text>
         if (location.protocol == 'https:' || location.protocol == 'https') {
-            window.open('@Html.Raw(ViewBag.NoHttps)');
+            this.$confirm('当前应用不支持HTTPS访问，如需继续操作请在新窗口中访问!!', '风险提示', {
+                confirmButtonText: '继续访问',
+                cancelButtonText: '放弃',
+                type: 'warning'
+            }).then(() => {
+                window.open('@Html.Raw(ViewBag.NoHttps)');
+            }).catch(() => {
+                app.$message({ type: 'info', message: '操作已取消，即将返回到上一个页面' });
+                history.back();
+            });
         } else {
             document.write('<iframe src="@Html.Raw(ViewBag.AppUrl)" frameborder="0" scrolling="auto" style="width:100%;height:100%;overflow:auto;"></iframe>');
         }
