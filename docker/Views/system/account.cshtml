@@ -6,7 +6,8 @@
     <div>
         <div class="wln-title">
             <div style="float:right">
-                <el-button size="mini" type="info" :plain="true" onclick="history.back()">返回</el-button><el-button size="mini" icon="el-icon-plus" type="primary" onclick="router.push('/system/account/add')">新增账号</el-button>
+                <el-button size="mini" type="info" :plain="true" onclick="history.back()">返回</el-button>
+                <el-button size="mini" icon="el-icon-plus" type="primary" onclick="router.push('/system/account/add')">新增账号</el-button>
                 <input type="text" v-model="key" :value="key" @@keydown="search($event)" placeholder="按回车键进行查找" />
             </div>
             账号管理<span>授权总数：@Html.Raw(ViewBag.wKeyUser)</span>
@@ -36,7 +37,9 @@
             <el-table-column width="150" align="center" property="create" label="添加时间"></el-table-column>
             <el-table-column width="260" label="操作">
                 <template scope="scope">
-                    <el-button size="mini" icon="el-icon-tickets" type="primary" @@click="handlePermission(scope.row)">权限管理</el-button><el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button><el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
+                    <el-button size="mini" icon="el-icon-tickets" type="primary" @@click="handlePermission(scope.row)">权限管理</el-button>
+                    <el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>

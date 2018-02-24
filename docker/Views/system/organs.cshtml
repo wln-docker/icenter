@@ -2,7 +2,7 @@
 <template id="app-list">
     <div class="wln">
         <div class="wln-title">
-            <el-button size="mini" type="primary" onclick="router.push('/system/organs/add')" style="float:right;">@Html.Raw("新增" + ViewBag.LabelOrgan)</el-button>
+            <el-button size="mini" icon="el-icon-plus" type="primary" onclick="router.push('/system/organs/add')" style="float:right;">@Html.Raw("新增" + ViewBag.LabelOrgan)</el-button>
             @Html.Raw(ViewBag.LabelOrgan)管理
         </div>
         <el-table :data="rows" :empty-text="message">
@@ -23,9 +23,10 @@
                     <font v-else style="color:#cccccc">停用</font>
                 </template>
             </el-table-column>
-            <el-table-column width="180" label="操作">
+            <el-table-column width="160" label="操作">
                 <template scope="scope">
-                    <el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button><el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
+                    <el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -35,7 +36,10 @@
 <template id="app-form">
     <div class="wln">
         <div class="wln-title">
-            @Html.Raw(ViewBag.LabelOrgan)信息 <a onclick="router.push('/system/organs')">返回</a>
+            <div style="float:right">
+                <el-button size="mini" type="info" :plain="true" onclick="history.back()">返回</el-button>
+            </div>
+            @Html.Raw(ViewBag.LabelOrgan)信息
         </div>
         <el-form ref="form" v-model="form" label-width="180px">
             <el-form-item label="@Html.Raw(ViewBag.LabelOrgan)简称">

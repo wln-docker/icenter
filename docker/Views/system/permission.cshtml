@@ -27,7 +27,9 @@
         <el-table-column property="description" label="权限说明"></el-table-column>
         <el-table-column width="200" label="操作" align="center">
             <template scope="scope">
-                <el-button size="mini" icon="el-icon-check" type="success" @@click="Change(scope.row.code)" v-if="scope.row.inlist" :plain="scope.row.empty">已授权</el-button><el-button size="mini" icon="el-icon-close" type="warning" @@click="Change(scope.row.code)" v-else :plain="scope.row.empty">未授权</el-button><el-button size="mini" icon="el-icon-refresh" type="danger" @@click="Remove(scope.row.code)" :plain="scope.row.empty" :disabled="scope.row.empty">重置</el-button>
+                <el-button size="mini" icon="el-icon-check" type="success" @@click="Change(scope.row.code)" v-if="scope.row.inlist" :plain="scope.row.empty">已授权</el-button>
+                <el-button size="mini" icon="el-icon-close" type="warning" @@click="Change(scope.row.code)" v-else :plain="scope.row.empty">未授权</el-button>
+                <el-button size="mini" icon="el-icon-refresh" type="danger" @@click="Remove(scope.row.code)" :plain="scope.row.empty" :disabled="scope.row.empty">重置</el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -40,7 +42,8 @@
         <el-table-column width="210" align="center" property="create" label="授权时间"></el-table-column>
         <el-table-column width="240" label="操作" align="center">
             <template scope="scope">
-                <el-button size="mini" icon="el-icon-sort" type="primary" @@click="setRoles(scope.row.role,scope.row.organ)">角色切换</el-button><el-button size="mini" icon="el-icon-tickets" type="primary" @@click="topage(2,scope.row.organ)">权限详情</el-button>
+                <el-button size="mini" icon="el-icon-sort" type="primary" @@click="setRoles(scope.row.role,scope.row.organ)">角色切换</el-button>
+                <el-button size="mini" icon="el-icon-tickets" type="primary" @@click="topage(2,scope.row.organ)">权限详情</el-button>
             </template>
         </el-table-column>
     </el-table>

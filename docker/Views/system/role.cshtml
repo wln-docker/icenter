@@ -9,7 +9,9 @@
     <div class="wln">
         <div class="wln-title">
             <div style="float:right">
-                <el-button size="mini" icon="el-icon-plus" type="primary" onclick="router.push('/system/role/add')">新增角色</el-button><el-button size="mini" icon="el-icon-news" type="primary" onclick="location.href='/system/authority'">权限点管理</el-button>
+                <el-button size="mini" type="info" :plain="true" onclick="history.back()">返回</el-button>
+                <el-button size="mini" icon="el-icon-plus" type="primary" onclick="router.push('/system/role/add')">新增角色</el-button>
+                <el-button size="mini" icon="el-icon-news" type="primary" onclick="location.href='/system/authority'">权限点管理</el-button>
             </div>
             角色及权限
         </div>
@@ -26,7 +28,9 @@
             <el-table-column></el-table-column>
             <el-table-column width="240" label="操作" align="center">
                 <template scope="scope">
-                    <el-button size="mini" icon="el-icon-tickets" type="primary" @@click="handlePermission(scope.row)">角色权限</el-button><el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button><el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
+                    <el-button size="mini" icon="el-icon-tickets" type="primary" @@click="handlePermission(scope.row)">角色权限</el-button>
+                    <el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
