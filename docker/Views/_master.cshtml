@@ -27,9 +27,9 @@
 </head>
 <body>
     <div id="main">
-        <div id="left" onselectstart="return false;">
+        <div id="left" class="min" onselectstart="return false;">
             <div class="logo" onclick="GoHome()"></div>
-            <div class="menu" id="menu" style="display:none">
+            <div class="menu" id="menu">
                 <span class="menu-switch" onclick="Switch()"><svg class="icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-menulines"></use></svg></span>
                 <div class="menu-group" v-for="group in groups">
                     <h2 class="menu-title">{{group.title}}</h2>

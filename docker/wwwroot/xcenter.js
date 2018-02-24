@@ -1,6 +1,6 @@
 ﻿var ts = 0;
-if (localStorage.getItem('left') == 'min') {
-    $('#left').addClass('min');
+if (localStorage.getItem('left') != 'min') {
+    $('#left').removeClass('min');
 }
 var menuStr = sessionStorage.getItem('menu');
 if (menuStr) {
@@ -17,7 +17,7 @@ function setMenu(data) {
     new Vue({
         el: '#menu', data: _data, router: xRouter, created() {
             this.checkLogin();
-            $('#menu').show();
+            $('.menu-group').show();
         }, methods: {
             submenu: function (sub, event) {
                 sub.open = !sub.open;
