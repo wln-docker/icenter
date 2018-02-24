@@ -13,9 +13,13 @@ Vue.prototype.getParam = (key) => {
 }
 //设置cookie
 Vue.prototype.setCookie = (c_name, value, expiredays) => {
-    var exdate = new Date();
-    exdate.setDate(exdate.getDate() + expiredays);
-    document.cookie = c_name + "=" + escape(value) + ((expiredays == null) ? "" : ";path=/;expires=" + exdate.toGMTString());
+    if (expiredays) {
+        var exdate = new Date();
+        exdate.setDate(exdate.getDate() + expiredays);
+        document.cookie = c_name + "=" + escape(value) + ";path=/;expires=" + exdate.toGMTString();
+    } else {
+        document.cookie = c_name + "=" + escape(value) + ";path=/;";
+    }
 }
 //获取cookie
 Vue.prototype.getCookie = (name) => {

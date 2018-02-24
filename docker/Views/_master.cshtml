@@ -19,7 +19,6 @@
     <script type="text/javascript" src="/vue/vue-router.js"></script>
     <script type="text/javascript" src="/vue/vue-xcenter.js?@ViewBag.ResVersion"></script>
     <script type="text/javascript" src="/vue/element-ui/index.js"></script>
-    <script type="text/javascript" src="//at.alicdn.com/t/font_323334_hovsz1ehmloez5mi.js"></script>
     <style type="text/css">
         #left .logo {background-image:url('@ViewBag.LogoBar')}
         #left.min .logo {background-image:url('@ViewBag.LogoMin')}
@@ -27,7 +26,7 @@
 </head>
 <body>
     <div id="main">
-        <div id="left" class="min" onselectstart="return false;">
+        <div id="left" class="@ViewBag.MenuStyle" onselectstart="return false;">
             <div class="logo" onclick="GoHome()"></div>
             <div class="menu" id="menu">
                 <span class="menu-switch" onclick="Switch()"><svg class="icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-menulines"></use></svg></span>
@@ -73,6 +72,7 @@
             @RenderBody()
         </div>
     </div>
+    <script type="text/javascript" src="//at.alicdn.com/t/font_323334_hovsz1ehmloez5mi.js"></script>
     <script type="text/javascript" src="/xcenter.js?@ViewBag.ResVersion"></script>
 </body>
 </html>

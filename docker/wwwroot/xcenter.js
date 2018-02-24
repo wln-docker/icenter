@@ -1,7 +1,4 @@
 ﻿var ts = 0;
-if (localStorage.getItem('left') != 'min') {
-    $('#left').removeClass('min');
-}
 var menuStr = sessionStorage.getItem('menu');
 if (menuStr) {
     setMenu(JSON.parse(menuStr));
@@ -32,13 +29,13 @@ function setMenu(data) {
     }
 }
 function Switch() {
-    if (localStorage.getItem('left') == 'min') {
+    if (Vue.prototype.getCookie('min') == '1') {
         $('#left').removeClass('min');
-        localStorage.removeItem('left');
+        Vue.prototype.delCookie('min');
         _data.nopopover = true;
     } else {
         $('#left').addClass('min');
-        localStorage.setItem('left', 'min')
+        Vue.prototype.setCookie('min', '1');
         _data.nopopover = false;
     }
 }
