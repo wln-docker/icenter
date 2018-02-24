@@ -1,0 +1,61 @@
+﻿<div id="app" class="wln">
+    <div class="wln-title">
+        <div style="float:right">
+            <el-button size="mini" icon="el-icon-news" type="primary" onclick="window.open('/export')">导出备份数据</el-button><el-button size="mini" icon="el-icon-plus" type="primary" onclick="location.href='/system/settings'">更多配置</el-button>
+        </div>
+        基础设置
+    </div>
+    <el-form label-width="240px">
+        <el-form-item label="系统名称">
+            <input id="SystemName" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.SystemName" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+        <el-form-item label="组织名称">
+            <input id="OrganName" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.OrganName" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+        <el-form-item label="Api Token">
+            <input id="Token" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.Token" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+        <el-form-item label="微信AppId">
+            <input id="WxAppId" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.WxAppId" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+        <el-form-item label="微信AppSecret">
+            <input id="WxAppSecret" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.WxAppSecret" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+        <el-form-item label="阿里云短信接口AppKey">
+            <input id="SmsAppKey" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.SmsAppKey" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+        <el-form-item label="阿里云短信接口AppSecret">
+            <input id="SmsAppSecret" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.SmsAppSecret" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+        <el-form-item label="短信接口签名AppKey">
+            <input id="SmsSignName" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.SmsSignName" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+        <el-form-item label="短信接口模板号">
+            <input id="SmsTemplate" onfocus="ClearTips()" onchange="ChangeSave(this)" type="text" value="@ViewBag.SmsTemplate" required="required" style="width:240px" /><span class="tips"></span>
+        </el-form-item>
+    </el-form>
+</div>
+<script type="text/javascript">
+    var app = new Vue({ el: '#app' });
+    function ClearTips() {
+        $(this).next().html('');
+    }
+    function ChangeSave(e) {
+        var obj = $(e);
+        if (obj.val() || !obj.attr('required')) {
+            obj.next().html('<font style="color:#2196F3">保存中...</font>');
+            $.getJSON(location.pathname + '?do=set', { key: obj.attr('id'), value: obj.val() }, function (json) {
+                if (json.success) {
+                    obj.next().html('<font style="color:#4CAF50">已保存</font>');
+                    setTimeout(function () {
+                        obj.next().html('');
+                    }, 2000);
+                } else {
+                    obj.next().html('<font style="color:#F44336">' + json.message + '</font>');
+                }
+            });
+        } else {
+            obj.next().html('<font style="color:#F44336">必填项</font>');
+        }
+    }
+</script>

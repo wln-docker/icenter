@@ -1,0 +1,5 @@
+﻿.el-tree{background-color:transparent}
+.el-table .cell,.el-select-dropdown__item {font-family:monospace;}
+.el-button + .el-button {margin-left:0px;}
+.wln-title .el-button--small,.wln-subtitle .el-button--small {line-height:16px;vertical-align:middle;}
+.wln-subtitle .el-input__inner {height:34px;}

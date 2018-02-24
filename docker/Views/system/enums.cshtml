@@ -1,0 +1,227 @@
+﻿<div id="app" class="wln">
+    <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keepAlive"></router-view>
+</div>
+<style>
+    .el-table .cell,.el-select-dropdown__item {font-family:monospace;}
+    .el-input-group__prepend {
+        color: #0094ff;
+    }
+</style>
+<template id="app-list">
+    <div>
+        <div class="wln-title">基础数据字典</div>
+        <el-input placeholder="输入关键字进行过滤" v-model="filterText" style="margin-bottom:10px;"></el-input>
+        <el-tree class="filter-tree" :data="tree" :props="defaultProps" :load="loadNode" :filter-node-method="filterNode" :render-content="renderContent" node-key="key" :default-expanded-keys="['_empty']" ref="tree" lazy></el-tree>
+    </div>
+</template>
+<template id="app-form">
+    <div>
+        <div class="wln-title">
+            <div style="float:right">
+                <el-button size="mini" type="info" :plain="true" onclick="history.back()">返回</el-button>
+            </div>
+            数据管理
+        </div>
+        <el-form ref="form" v-model="form" label-width="180px">
+            <el-form-item label="Label名称">
+                <el-input v-model="form.label" placeholder="必填"></el-input>
+            </el-form-item>
+            <el-form-item label="Key值">
+                <el-input placeholder="必填" v-model="form.key">
+                    <template slot="prepend" v-if="form.parent">
+                        {{form.parent}}
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="字段说明">
+                <el-input v-model="form.description" placeholder="选填"></el-input>
+            </el-form-item>
+            <el-form-item label="排序">
+                <el-input v-model="form.sort" placeholder="" style="width:60px"></el-input><span class="tips">数值越小越靠前</span>
+            </el-form-item>
+            <el-form-item label="状态">
+                <el-switch on-text="启用" off-text="停用" on-value="1" off-value="0" v-model="form.state"></el-switch>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @@click="onSubmit">提交</el-button>
+                <el-button onclick="router.push('/system/enums')">返回</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</template>
+<script>
+    var ctxData;
+    var ctxStore;
+    var appList = Vue.extend({
+        template: '#app-list',
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
+            }
+        },
+        methods: {
+            loadNode(node, resolve) {
+                $.getJSON(location.pathname, { 'do': 'tree', app: node.data.app, parent: node.data.key }, function (rlt) {
+                    resolve(rlt);
+                    node.data.children = rlt;
+                });
+            },
+            filterNode(value, data) {
+                if (value) {
+                    return data.label.indexOf(value) !== -1;
+                } else {
+                    return true
+                }
+            },
+            renderContent(h, ctx) {
+                _self = this;
+                var bts = new Array()
+                if (ctx.data.key && ctx.data.key != '_empty') {
+                    bts.push(h('button', {
+                        'attrs': { 'type': 'button' }, 'class': 'el-button el-button--success el-button--mini', 'on': {
+                            'click': function (e) {
+                                e.stopPropagation();
+                                ctxData = ctx.data;
+                                ctxStore = null;
+                                router.push('/system/enums/edit?id=' + ctx.data.id);
+                            }
+                        }
+                    }, '编辑'));
+                    bts.push(h('button', {
+                        'attrs': { 'type': 'button' }, 'class': 'el-button el-button--danger el-button--mini', 'on': {
+                            'click': function (e) {
+                                e.stopPropagation();
+                                app.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+                                    confirmButtonText: '删除',
+                                    cancelButtonText: '取消',
+                                    type: 'warning'
+                                }).then(() => {
+                                    $.getJSON(location.pathname, { 'do': 'del', id: ctx.data.id }, function (rlt) {
+                                        if (rlt.success) {
+                                            ctx.store.remove(ctx.data);
+                                        }
+                                        app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                                    });
+                                }).catch(() => {
+                                    app.$message({ type: 'info', message: '删除操作已取消' });
+                                });
+                            }
+                        }
+                    }, '删除'));
+                }
+                bts.push(h('button', {
+                    'attrs': { 'type': 'button' }, 'class': 'el-button el-button--info el-button--mini',
+                    'on': {
+                        'click': function (e) {
+                            e.stopPropagation();
+                            ctxData = ctx.data;
+                            ctxStore = ctx.store;
+                            var url = '/system/enums/add';
+                            if (ctx.data.app && ctx.data.app != '_empty') {
+                                url += '?app=' + ctx.data.app; if (ctx.data.key && ctx.data.key != '_empty') {
+                                    url += '&parent=' + ctx.data.key;
+                                }
+                            } else if (ctx.data.key && ctx.data.key != '_empty') {
+                                url += '?parent=' + ctx.data.key;
+                            }
+                            router.push(url);
+                        }
+                    }
+                }, '增加子字段'));
+                return h('div', { 'style': 'width: 100%' }, [
+                    h('span', { 'style': 'float: right; margin-right:20px' }, bts)
+                    ,
+                    h('span', ctx.data.label)
+                    ,
+                    h('span', { 'style': 'font-size:0.8em;position:absolute;left:300px;color:' + (ctx.data.key == '_empty' ? '#333333' : '#20a0ff') }, ctx.data.key == '_empty' ? ctx.data.description : ctx.data.key)
+                ]);
+            }
+        },
+        data: function () {
+            return {
+                filterText: '',
+                tree: [],
+                defaultProps: {
+                    children: 'children',
+                    label: 'label'
+                }
+            };
+        }
+    })
+    var appForm = Vue.extend({
+        template: '#app-form',
+        data: function () {
+            return {
+                form: {
+                    id: ''
+                    ,
+                    app: ''
+                    ,
+                    key: ''
+                    ,
+                    label: ''
+                    ,
+                    description: ''
+                    ,
+                    parent: this.getParam('parent')
+                    ,
+                    sort: ''
+                    ,
+                    state: '1'
+                },
+                types: []
+            };
+        },
+        methods: {
+            onSubmit: function () {
+                var obj = this.form;
+                $.post(location.pathname + '?do=set', obj, function (rlt) {
+                    app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    if (rlt.success) {
+                        if (!ctxData) {
+                            ctxData = obj;
+                        } else if (obj.id) {
+                            ctxData.key = obj.parent + '-' + obj.key;
+                            ctxData.label = obj.label;
+                        } else if (ctxStore) {
+                            ctxStore.append({ id: rlt.data, app: obj.app, key: obj.parent + '-' + obj.key, label: obj.label }, ctxData);
+                        }
+                        router.push('/system/enums');
+                    }
+                });
+            }
+        }, created() {
+            var obj = this.form;
+            obj.id = this.getParam('id');
+            if (obj.id) {
+                $.getJSON(location.pathname, { 'do': 'get', id: obj.id }, function (rlt) {
+                    if (rlt.success) {
+                        obj.id = rlt.data.id;
+                        obj.app = rlt.data.app;
+                        obj.key = rlt.data.key;
+                        obj.label = rlt.data.label;
+                        obj.parent = rlt.data.parent;
+                        obj.description = rlt.data.description;
+                        obj.sort = rlt.data.sort;
+                        obj.state = rlt.data.state;
+                    } else {
+                        app.$message({ type: 'info', message: rlt.message });
+                    }
+                });
+            } else if (this.getParam('app')) {
+                obj.app = this.getParam('app');
+            }
+        }
+    })
+    var router = new VueRouter({
+        mode: 'history', routes: [
+            { path: '/system/enums', component: appList, meta: { keepAlive: true } }
+            , { path: '/system/enums/add', component: appForm, meta: { keepAlive: false } }
+            , { path: '/system/enums/edit', component: appForm, meta: { keepAlive: false } }
+        ]
+    });
+    var app = new Vue({ el: '#app', router: router });
+</script>

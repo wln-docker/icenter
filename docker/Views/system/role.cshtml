@@ -1,0 +1,289 @@
+﻿<style>
+    .el-table .base-row {
+        font-weight:bold;
+        background: #f4feff;
+    }
+</style>
+<div id="app"><router-view></router-view></div>
+<template id="app-list">
+    <div class="wln">
+        <div class="wln-title">
+            <div style="float:right">
+                <el-button size="mini" icon="el-icon-plus" type="primary" onclick="router.push('/system/role/add')">新增角色</el-button><el-button size="mini" icon="el-icon-news" type="primary" onclick="location.href='/system/authority'">权限点管理</el-button>
+            </div>
+            角色及权限
+        </div>
+        <el-table :data="rows" :row-class-name="tableRowClassName" :empty-text="message" style="width:100%">
+            <el-table-column width="150" property="name" label="名称"></el-table-column>
+            <el-table-column width="90" label="类型">
+                <template scope="scope">
+                    <font v-if="scope.row.type===1">@Html.Raw(ViewBag.LabelOrgan)角色</font>
+                    <font v-else>基础角色</font>
+                </template>
+            </el-table-column>
+            <el-table-column width="100" property="code" label="编码"></el-table-column>
+            <el-table-column width="80" property="count" label="用户数" align="center"></el-table-column>
+            <el-table-column></el-table-column>
+            <el-table-column width="240" label="操作" align="center">
+                <template scope="scope">
+                    <el-button size="mini" icon="el-icon-tickets" type="primary" @@click="handlePermission(scope.row)">角色权限</el-button><el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button><el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="index" :page-size="size" :total="total"></el-pagination>
+    </div>
+</template>
+<template id="app-form">
+    <div class="wln">
+        <div class="wln-title">
+            角色信息 <a onclick="router.push('/system/role')">返回</a>
+        </div>
+        <el-form ref="form" v-model="form" label-width="80px">
+            <el-form-item label="角色名称">
+                <el-input v-model="form.name" placeholder="必填" style="width:320px" @@change="pinyin"></el-input><span class="tips notnull"></span>
+            </el-form-item>
+            <el-form-item label="角色编码">
+                <el-input v-model="form.code" placeholder="必填" style="width:320px" :disabled="form.editcode.length > 0"></el-input><span class="tips notnull"></span>
+            </el-form-item>
+            <el-form-item label="角色类型">
+                <el-select v-model="form.type" @@change="typeChange" placeholder="请选择" style="width:120px">
+                    <el-option v-for="item in types" :label="item.label" :value="item.value"></el-option>
+                </el-select> {{form.text}}
+            </el-form-item>
+            <el-form-item>
+                <el-button icon="el-icon-check" type="primary" @@click="onSubmit">提交</el-button>
+                <el-button icon="el-icon-close" onclick="router.push('/system/role')">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</template>
+<template id="app-permission">
+    <div class="wln">
+        <div class="wln-title">
+            <div style="float:right">
+                <input type="text" v-model="key" :value="key" @@keydown="search($event)" placeholder="按回车键进行查找" />
+            </div>
+            <el-button-group>
+                <el-button size="mini" plain type="info" @@click="goback()"><svg class="icon"><use v-bind:xlink:href="'#icon-left'"></use></svg> 返回</el-button>
+                <el-button size="mini" v-bind:plain="type!==0" type="primary" @@click="topage(0)" v-if="roletype==0"><svg class="icon"><use v-bind:xlink:href="'#icon-setting'"></use></svg> 系统权限</el-button>
+                <el-button size="mini" v-bind:plain="type!==1" type="primary" @@click="topage(1)" v-if="roletype==0"><svg class="icon"><use v-bind:xlink:href="'#icon-apps'"></use></svg> 业务权限</el-button>
+                <el-button size="mini" type="primary" @@click="topage(2)" v-if="roletype==1"><svg class="icon"><use v-bind:xlink:href="'#icon-organ'"></use></svg> @Html.Raw(ViewBag.LabelOrgan)权限</el-button>
+            </el-button-group>
+        </div>
+        <el-table :data="rows" :empty-text="message" style="width:100%">
+            <el-table-column width="210" property="name" label="权限名称"></el-table-column>
+            <el-table-column property="description" label="权限说明"></el-table-column>
+            <el-table-column width="180" label="操作" align="center">
+                <template scope="scope">
+                    <el-button size="mini" plain type="success" @@click="handleEdit(scope.row)" v-if="scope.row.inlist">已授权</el-button>
+                    <el-button size="mini" plain type="warning" @@click="handleEdit(scope.row)" v-else>未授权</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+</template>
+<script type="text/javascript">
+    var appList = Vue.extend({
+        template: '#app-list',
+        data: function () { return emptyPager },
+        methods: {
+            refresh() {
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'list', page: _self.index, rows: _self.size, key: _self.key }, function (rlt) {
+                    _self.message = rlt.message;
+                    _self.total = rlt.total;
+                    _self.index = rlt.index;
+                    _self.size = rlt.size;
+                    _self.rows = rlt.rows;
+                });
+            },
+            search(event) {
+                if (event.keyCode == 13) {
+                    this.refresh()
+                }
+            },
+            sizeChange(val) {
+                emptyPager.size = val;
+                this.refresh();
+            },
+            currentChange(val) {
+                emptyPager.index = val;
+                this.refresh();
+            },
+            tableRowClassName({ row, rowIndex }) {
+                if (row.type === 0) {
+                    return 'base-row';
+                }
+                return '';
+            },
+            handlePermission(row) {
+                router.push('/system/role/permission?code=' + row.code + '&roletype=' + row.type);
+            },
+            handleEdit(row) {
+                router.push('/system/role/edit?code=' + row.code);
+            },
+            handleDelete(row) {
+                this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    if (new Date().getTime() - ts < 10000) {
+                        return app.$message({ type: 'info', message: '请求正在处理中，请稍候' });
+                    }
+                    else {
+                        ts = new Date().getTime();
+                    }
+                    var _self = this;
+                    $.getJSON(location.pathname, { 'do': 'del', code: row.code }, function (rlt) {
+                        ts = 0;
+                        _self.refresh();
+                        app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    });
+                }).catch(() => {
+                    app.$message({ type: 'info', message: '删除操作已取消' });
+                });
+            }
+        }, created() {
+            this.refresh();
+        }
+    })
+    var appForm = Vue.extend({
+        template: '#app-form',
+        data: function () {
+            return {
+                form: {
+                    code: ''
+                    ,
+                    name: ''
+                    ,
+                    type: 1
+                    ,
+                    editcode: ''
+                    ,
+                    text: ''
+                },
+                types: [{ value: 0, label: '基础角色', text: '用户账号的基础角色及权限' }, { value: 1, label: '@Html.Raw(ViewBag.LabelOrgan)角色', text: '用户在各' + '@Html.Raw(ViewBag.LabelOrgan)中的角色及权限' }]
+            };
+        },
+        methods: {
+            pinyin(val) {
+                if (!this.form.editcode) {
+                    _self = this.form;
+                    $.ajaxSetup({ aysnc: true });
+                    $.getJSON('/system/helper', { 'do': 'pinyin', str: val }, function (rlt) {
+                        if (rlt.success) {
+                            _self.code = rlt.data;
+                        }
+                    });
+                }
+            },
+            typeChange(val) {
+                this.form.text = this.types[val].text;
+            },
+            onSubmit: function () {
+                if (new Date().getTime() - ts < 10000) {
+                    return app.$message({ type: 'info', message: '请求正在处理中，请稍候' });
+                }
+                else {
+                    ts = new Date().getTime();
+                }
+                var obj = this.form;
+                $.post(location.pathname + '?do=set', obj, function (rlt) {
+                    ts = 0;
+                    app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    if (rlt.success) {
+                        obj.sid = rlt.data;
+                        router.push('/system/role');
+                    }
+                });
+            }
+        }, created() {
+            _self = this;
+            var obj = _self.form;
+            obj.editcode = this.getParam('code');
+            if (obj.editcode) {
+                $.getJSON(location.pathname, { 'do': 'get', code: obj.editcode }, function (rlt) {
+                    if (rlt.success) {
+                        obj.code = rlt.data.code;
+                        obj.name = rlt.data.name;
+                        obj.type = rlt.data.type;
+                        obj.text = _self.types[obj.type].text;
+                    } else {
+                        app.$message({ type: 'info', message: rlt.message });
+                    }
+                });
+            } else {
+                this.form.text = this.types[this.form.type].text;
+            }
+        }
+    })
+    var appPermission = Vue.extend({
+        template: '#app-permission',
+        data: function () {
+            emptyPager.type = 0;
+            emptyPager.code = '';
+            emptyPager.roletype = 0;
+            return emptyPager
+        },
+        methods: {
+            refresh() {
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'authority', page: 1, rows: 1000, code: _self.code, type: _self.type, key: _self.key }, function (rlt) {
+                    _self.message = rlt.message;
+                    _self.total = rlt.total;
+                    _self.index = rlt.index;
+                    _self.size = rlt.size;
+                    _self.rows = rlt.rows;
+                });
+            },
+            goback() {
+                this.total = 0;
+                this.index = 1;
+                this.size = 10;
+                this.rows = [];
+                router.push('/system/role');
+            },
+            topage(to) {
+                this.rows = [];
+                this.type = to;
+                this.message = '正在加载角色权限数据';
+                this.refresh();
+            },
+            search(event) {
+                if (event.keyCode == 13) {
+                    this.refresh()
+                }
+            },
+            handleEdit(row) {
+                if (new Date().getTime() - ts < 10000) {
+                    return app.$message({ type: 'info', message: '请求正在处理中，请稍候' });
+                }
+                else {
+                    ts = new Date().getTime();
+                }
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'setauthority', code: _self.code, authority: row.code }, function (rlt) {
+                    ts = 0;
+                    _self.refresh();
+                    app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                });
+            }
+        }, created() {
+            emptyPager.code = this.getParam('code');
+            emptyPager.roletype = parseInt(this.getParam('roletype'));
+            this.type = 0;
+            this.rows = [];
+            this.refresh();
+        }
+    })
+    var router = new VueRouter({
+        mode: 'history', routes: [
+            { path: '/system/role', component: appList }
+            , { path: '/system/role/add', component: appForm }
+            , { path: '/system/role/edit', component: appForm }
+            , { path: '/system/role/permission', component: appPermission }
+        ]
+    });
+    var app = new Vue({ el: '#app', router: router });
+</script>

@@ -1,0 +1,199 @@
+﻿<div id="app"><router-view></router-view></div>
+<template id="app-list">
+    <div class="wln">
+        <div class="wln-title">
+            <div style="float:right">
+                <el-button size="mini" icon="el-icon-plus" type="primary" onclick="router.push('/system/authority/add?type=' + emptyPager.type)">新增权限点</el-button>
+                <input type="text" v-model="key" :value="key" @@keydown="search($event)" placeholder="按回车键进行查找" />
+            </div>
+            <el-button-group>
+                <el-button plain size="mini" type="info" @@click="location.href='/system/role'"><svg class="icon"><use v-bind:xlink:href="'#icon-left'"></use></svg></el-button>
+                <el-button v-bind:plain="emptyPager.type!==0" size="mini" type="primary" @@click="topage(0,'')"><svg class="icon"><use v-bind:xlink:href="'#icon-setting'"></use></svg> 系统权限</el-button>
+                <el-button v-bind:plain="emptyPager.type!==1" size="mini" type="primary" @@click="topage(1,'')"><svg class="icon"><use v-bind:xlink:href="'#icon-apps'"></use></svg> 业务权限</el-button>
+                <el-button v-bind:plain="emptyPager.type!==2" size="mini" type="primary" @@click="topage(2,'')"><svg class="icon"><use v-bind:xlink:href="'#icon-organ'"></use></svg> @Html.Raw(ViewBag.LabelOrgan)权限</el-button>
+            </el-button-group>
+        </div>
+        <el-table :data="rows" :empty-text="message"  style="width:100%">
+            <el-table-column width="90" label="类型">
+                <template scope="scope">
+                    <font v-if="scope.row.type===2">@Html.Raw(ViewBag.LabelOrgan)权限</font>
+                    <font v-else-if="scope.row.type===1">模块权限</font>
+                    <font v-else>系统权限</font>
+                </template>
+            </el-table-column>
+            <el-table-column width="150" property="name" label="权限名称"></el-table-column>
+            <el-table-column property="description" label="权限说明"></el-table-column>
+            <el-table-column width="220" property="code" label="编码"></el-table-column>
+            <el-table-column width="150" label="操作" align="center">
+                <template scope="scope">
+                    <el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button><el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="index" :page-size="size" :total="total"></el-pagination>
+    </div>
+</template>
+<template id="app-form">
+    <div class="wln">
+        <div class="wln-title">权限信息</div>
+        <el-form ref="form" v-model="form" label-width="180px">
+            <el-form-item label="权限名称">
+                <el-input v-model="form.name" placeholder="必填" style="width:320px"></el-input>
+            </el-form-item>
+            <el-form-item label="权限编码">
+                <el-input v-model="form.code" placeholder="必填" style="width:320px" :disabled="form.editcode.length > 0"></el-input>
+            </el-form-item>
+            <el-form-item label="权限类型">
+                <el-select v-model="form.type" @@change="typeChange" placeholder="请选择" style="width:120px">
+                    <el-option v-for="item in types" :label="item.label" :value="item.value"></el-option>
+                </el-select> {{form.text}}
+            </el-form-item>
+            <el-form-item label="权限说明">
+                <el-input v-model="form.description" placeholder="" style="width:320px"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button icon="el-icon-check" type="primary" @@click="onSubmit">提交</el-button>
+                <el-button v-model="form" icon="el-icon-close" onclick="router.push('/system/authority?type=' + emptyPager.type)">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</template>
+<script type="text/javascript">
+    var appList = Vue.extend({
+        template: '#app-list',
+        data: function () {
+            emptyPager.type = 0;
+            return emptyPager;
+        },
+        methods: {
+            refresh() {
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'list', page: _self.index, rows: _self.size, type: _self.type, key: _self.key }, function (rlt) {
+                    _self.message = rlt.message;
+                    _self.total = rlt.total;
+                    _self.index = rlt.index;
+                    _self.size = rlt.size;
+                    _self.rows = rlt.rows;
+                });
+            },
+            topage(to) {
+                emptyPager.rows = [];
+                emptyPager.type = to;
+                this.refresh()
+            },
+            search(event) { 
+                if (event.keyCode == 13) {
+                    this.refresh()
+                }
+            },
+            sizeChange(val) {
+                emptyPager.size = val;
+                this.refresh();
+            },
+            currentChange(val) {
+                emptyPager.index = val;
+                this.refresh();
+            },
+            handleEdit(row) {
+                router.push('/system/authority/edit?code=' + row.code);
+            },
+            handleDelete(row) {
+                this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    if (new Date().getTime() - ts < 10000) {
+                        return app.$message({ type: 'info', message: '请求正在处理中，请稍候' });
+                    }
+                    else {
+                        ts = new Date().getTime();
+                    }
+                    var _self = this;
+                    $.getJSON(location.pathname, { 'do': 'del', code: row.code }, function (rlt) {
+                        ts = 0;
+                        _self.refresh();
+                        app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    });
+                }).catch(() => {
+                    app.$message({ type: 'info', message: '删除操作已取消' });
+                });
+            }
+        }, created() {
+            _t = this.getParam('type');
+            emptyPager.type = _t ? parseInt(_t) : 0;
+            this.refresh();
+        }
+    })
+    var appForm = Vue.extend({
+        template: '#app-form',
+        data: function () {
+            return {
+                form: {
+                    code: ''
+                    ,
+                    name: ''
+                    ,
+                    type: 0
+                    ,
+                    description: ''
+                    ,
+                    text: ''
+                },
+                types: [{ value: 0, label: '系统权限', text: '系统管理的操作权限' }, { value: 1, label: '模块权限', text: '业务模块的操作权限' }, { value: 2, label: '@Html.Raw(ViewBag.LabelOrgan)权限', text: '根据' +'@Html.Raw(ViewBag.LabelOrgan)分配的权限' }]
+            };
+        },
+        methods: {
+            typeChange(val) {
+                emptyPager.type = val;
+                this.form.text = this.types[val].text;
+            },
+            onSubmit: function () {
+                if (new Date().getTime() - ts < 10000) {
+                    return app.$message({ type: 'info', message: '请求正在处理中，请稍候' });
+                }
+                else {
+                    ts = new Date().getTime();
+                }
+                var obj = this.form;
+                $.post(location.pathname + '?do=set', obj, function (rlt) {
+                    ts = 0;
+                    app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    if (rlt.success) {
+                        obj.sid = rlt.data;
+                        router.push('/system/authority');
+                    }
+                });
+            }
+        }, created() {
+            _self = this;
+            var obj = _self.form;
+            obj.editcode = this.getParam('code');
+            if (obj.editcode) {
+                $.getJSON(location.pathname, { 'do': 'get', code: obj.editcode }, function (rlt) {
+                    if (rlt.success) {
+                        obj.code = rlt.data.code;
+                        obj.name = rlt.data.name;
+                        obj.type = rlt.data.type;
+                        obj.description = rlt.data.description;
+                        obj.text = _self.types[obj.type].text;
+                    } else {
+                        app.$message({ type: 'info', message: rlt.message });
+                    }
+                });
+            } else {
+                _t = this.getParam('type');
+                this.form.type = _t ? parseInt(_t) : 0;
+                this.form.text = this.types[this.form.type].text;
+            }
+        }
+    })
+    var router = new VueRouter({
+        mode: 'history', routes: [
+            { path: '/system/authority', component: appList }
+            , { path: '/system/authority/add', component: appForm }
+            , { path: '/system/authority/edit', component: appForm }
+        ]
+    });
+    var app = new Vue({ el: '#app', router: router });
+</script>

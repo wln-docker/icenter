@@ -1,0 +1,7 @@
+﻿*.dg
+*.log
+*.user
+*.wkey
+/app
+/*/cache
+/*/GitPush.bat

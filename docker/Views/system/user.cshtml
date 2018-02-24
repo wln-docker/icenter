@@ -1,0 +1,91 @@
+﻿<div id="app"><router-view></router-view></div>
+<template id="app-list">
+    <div class="wln">
+        <div class="wln-title">
+            <div style="float:right">
+                <input type="text" v-model="key" :value="key" @@keydown="search($event)" placeholder="按回车键进行查找" />
+            </div>
+            注册用户
+        </div>
+        <el-table :data="rows" :empty-text="message">
+            <el-table-column width="150" align="center" property="mobile" label="手机号"></el-table-column>
+            <el-table-column width="190" align="center" property="name" label="姓名"></el-table-column>
+            <el-table-column width="auto" align="center" label=""></el-table-column>
+            <el-table-column width="90" align="center" label="微信号">
+                <template scope="scope">
+                    <el-tag type="success" v-if="scope.row.wxopenid">已绑定</el-tag>
+                    <el-tag type="gray" v-else>未绑定</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column width="190" align="center" property="create" label="注册时间"></el-table-column>
+            <el-table-column width="190" align="center" property="loginlast" label="最后登录"></el-table-column>
+        </el-table>
+        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="index" :page-size="size" :total="total"></el-pagination>
+    </div>
+</template>
+<script type="text/javascript">
+    var appList = Vue.extend({
+        template: '#app-list',
+        data: function () { return emptyPager },
+        methods: {
+            refresh() {
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'list', page: _self.index, rows: _self.size, key: _self.key }, function (rlt) {
+                    _self.message = rlt.message;
+                    _self.total = rlt.total;
+                    _self.index = rlt.index;
+                    _self.size = rlt.size;
+                    _self.rows = rlt.rows;
+                });
+            },
+            search(event) { 
+                if (event.keyCode == 13) {
+                    this.refresh()
+                }
+            },
+            sizeChange(val) {
+                emptyPager.size = val;
+                this.refresh();
+            },
+            currentChange(val) {
+                emptyPager.index = val;
+                this.refresh();
+            },
+            rightOrgan(row) {
+                location.href = '/system/rights/organs?sid=' + row.sid;
+            },
+            rightApp(row) {
+                location.href = '/system/rights/app?sid=' + row.sid;
+            },
+            rightSys(row) {
+                location.href = '/system/rights/sys?sid=' + row.sid;
+            },
+            handleEdit(row) {
+                router.push('/system/account/edit?sid=' + row.sid);
+            },
+            handleDelete(row) {
+                this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    var _self = this;
+                    $.getJSON(location.pathname, { 'do': 'del', sid: row.sid }, function (rlt) {
+                        _self.refresh();
+                        app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    });
+                }).catch(() => {
+                    app.$message({ type: 'info', message: '删除操作已取消' });
+                });
+            }
+        }, created() {
+            this.refresh();
+        }
+    })
+    var router = new VueRouter({
+        mode: 'history', routes: [
+            { path: '/system/user', component: appList }
+        ]
+    });
+    var app = new Vue({ el: '#app', router: router });
+</script>

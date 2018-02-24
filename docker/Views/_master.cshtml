@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>@Html.Raw(ViewBag.SystemName)</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="wlniao" />
+    <meta name="renderer" content="webkit" />
+    <link rel="stylesheet" href="/vue/element-ui/theme-chalk/index.css">
+    <link rel="stylesheet" href="/xcenter.css?@ViewBag.ResVersion" />
+    <link rel="stylesheet" href="/oem/style.css?@ViewBag.ResVersion" />
+    <script type="text/javascript">
+        var _ua = navigator.userAgent.toLowerCase();
+        if (_ua.indexOf('msie') >= 0 || _ua.indexOf('firefox') >= 0 || _ua.indexOf('opera') >= 0 || _ua.indexOf('chrome') < 0) {
+            document.write('<div style="font-size:12px;color:#333;width:100%;height:40px;line-height:40px;background:#FFC107;text-align:center;">您正在使用浏览器未完全支持本系统特性，我们推荐使用以下浏览器： <a href="http://browser.qq.com">QQ浏览器</a> / <a href="http://se.360.cn">360安全浏览器</a> / <a href="http://www.google.com/chrome/?hl=zh-CN">Chrome最新版</a></div>');
+        }
+    </script>
+    <script type="text/javascript" src="/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/vue/vue.min.js"></script>
+    <script type="text/javascript" src="/vue/vue-router.js"></script>
+    <script type="text/javascript" src="/vue/vue-xcenter.js?@ViewBag.ResVersion"></script>
+    <script type="text/javascript" src="/vue/element-ui/index.js"></script>
+    <script type="text/javascript" src="//at.alicdn.com/t/font_323334_hovsz1ehmloez5mi.js"></script>
+    <style type="text/css">
+        #left .logo {background-image:url('@ViewBag.LogoBar')}
+        #left.min .logo {background-image:url('@ViewBag.LogoMin')}
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div id="left" onselectstart="return false;">
+            <div class="logo" onclick="GoHome()"></div>
+            <div class="menu" id="menu" style="display:none">
+                <span class="menu-switch" onclick="Switch()"><svg class="icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-menulines"></use></svg></span>
+                <div class="menu-group" v-for="group in groups">
+                    <h2 class="menu-title">{{group.title}}</h2>
+                    <div v-for="item in group.items">
+                        <div v-if="item.sub">
+                            <a class="menu-item has-sub" v-bind:class="{'active':item.open}" @@click="submenu(item,$event)">
+                                <el-tooltip content="展开/收拢" placement="right">
+                                    <svg class="icon min">
+                                        <use xlink:href="#icon-down" v-if="item.open"></use>
+                                        <use xlink:href="#icon-right" v-else></use>
+                                    </svg>
+                                </el-tooltip>
+                                <el-tooltip :disabled="nopopover" :content="item.name" placement="right">
+                                    <svg class="icon" v-if="item.icon.indexOf('//') < 0"><use v-bind:xlink:href="'#icon-' + item.icon"></use></svg>
+                                    <img class="icon" :src="item.icon" v-else />
+                                </el-tooltip>
+                                <span class="text">{{item.name}}</span>
+                            </a>
+                            <div class="menu-item-container" v-bind:class="{'no-hide':item.open}">
+                                <router-link class="menu-item menu-item-sub" :to="sub.link" v-for="sub in item.sublist">
+                                    <el-tooltip :disabled="nopopover" :content="sub.name" placement="right">
+                                        <svg class="icon" v-if="sub.icon.indexOf('//') < 0"><use v-bind:xlink:href="'#icon-' + sub.icon"></use></svg>
+                                        <img class="icon" :src="sub.icon" v-else />
+                                    </el-tooltip>
+                                    <span class="text">{{sub.name}}</span>
+                                </router-link>
+                            </div>
+                        </div>
+                        <router-link class="menu-item" :to="item.link" v-else>
+                            <el-tooltip :disabled="nopopover" :content="item.name" placement="right">
+                                <svg class="icon" v-if="item.icon.indexOf('//') < 0"><use v-bind:xlink:href="'#icon-' + item.icon"></use></svg>
+                                <img class="icon" :src="item.icon" v-else />
+                            </el-tooltip>
+                            <span class="text">{{item.name}}</span>
+                        </router-link>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="center">
+            @RenderBody()
+        </div>
+    </div>
+    <script type="text/javascript" src="/xcenter.js?@ViewBag.ResVersion"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+﻿<div id="app" class="wln">
+    <div class="wln-title">密码修改</div>
+    <el-form label-width="240px">
+        <el-form-item label="原密码">
+            <el-col :span="18">
+                <el-input type="password" v-model="opwd" style="width:150px;"></el-input><span class="tips notnull"></span>
+        </el-form-item>
+        <el-form-item label="新密码">
+            <el-col :span="18">
+                <el-input type="password" v-model="npwd" style="width:150px;"></el-input><span class="tips notnull"></span>
+        </el-form-item>
+        <el-form-item label="再次确认">
+            <el-col :span="18">
+                <el-input type="password" v-model="rpwd" style="width:150px;"></el-input><span class="tips notnull"></span>
+        </el-form-item>
+        <el-form-item>
+            <el-button @@click="onSubmit" type="primary">提交</el-button>
+            <el-button @@click="onClear">取消</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+<script type="text/javascript">
+    var obj = { opwd: '', npwd: '', rpwd: '' };
+    var app = new Vue({
+        data: obj,
+        methods: {
+            onClear: function () {
+                obj.opwd = '';
+                obj.npwd = '';
+                obj.rpwd = '';
+            },
+            onSubmit: function () {
+                if (!obj.opwd) {
+                    app.$message({ type: 'info', message: '旧密码未输入，请输入' });
+                } else if (!obj.npwd) {
+                    app.$message({ type: 'info', message: '新密码未输入，请输入' });
+                } else if (obj.npwd != obj.rpwd) {
+                    app.$message({ type: 'info', message: '两次密码不一致，请修改' });
+                } else {
+                    if (new Date().getTime() - ts < 15000) {
+                        app.$message({ type: 'info', message: '请求正在处理中，请稍候' });
+                    }
+                    else {
+                        ts = new Date().getTime();
+                        $.get(location.pathname + "?do=save", obj, function (json) {
+                            ts = 0;
+                            if (json.success) {
+                                obj.opwd = '';
+                                obj.npwd = '';
+                                obj.rpwd = '';
+                                app.$message({ type: 'success', message: '密码修改成功，下次请使用新密码登录' });
+                            } else {
+                                app.$message({ type: 'error', message: json.message });
+                            }
+                        }, "json");
+                    }
+                }
+            }
+        },
+        el: '#app', created() {
+
+        }
+    });
+</script>

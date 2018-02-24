@@ -1,0 +1,173 @@
+﻿<div id="app"><router-view></router-view></div>
+<template id="app-list">
+    <div class="wln">
+        <div class="wln-title">
+            <el-button size="mini" type="primary" onclick="router.push('/system/organs/add')" style="float:right;">@Html.Raw("新增" + ViewBag.LabelOrgan)</el-button>
+            @Html.Raw(ViewBag.LabelOrgan)管理
+        </div>
+        <el-table :data="rows" :empty-text="message">
+            <el-table-column width="160" align="center" label="名称">
+                <template scope="scope">
+                    <el-popover trigger="hover" placement="right">
+                        <p>编号: {{ scope.row.id }}</p>
+                        <p>全称: {{ scope.row.fullname }}</p>
+                        <p>权重: {{ scope.row.sort }}</p>
+                        <div slot="reference" class="name-wrapper">{{ scope.row.name }}</div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <el-table-column label="分类" property="type"></el-table-column>
+            <el-table-column width="70" align="center" label="状态">
+                <template scope="scope">
+                    <font v-if="scope.row.state==='1'">正常</font>
+                    <font v-else style="color:#cccccc">停用</font>
+                </template>
+            </el-table-column>
+            <el-table-column width="180" label="操作">
+                <template scope="scope">
+                    <el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button><el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="index" :page-size="size" :total="total"></el-pagination>
+    </div>
+</template>
+<template id="app-form">
+    <div class="wln">
+        <div class="wln-title">
+            @Html.Raw(ViewBag.LabelOrgan)信息 <a onclick="router.push('/system/organs')">返回</a>
+        </div>
+        <el-form ref="form" v-model="form" label-width="180px">
+            <el-form-item label="@Html.Raw(ViewBag.LabelOrgan)简称">
+                <el-input v-model="form.name" placeholder="尽量少于5个汉字" style="width:320px"></el-input>
+            </el-form-item>
+            <el-form-item label="@Html.Raw(ViewBag.LabelOrgan)全称">
+                <el-input v-model="form.fullname" placeholder="" style="width:320px"></el-input>
+            </el-form-item>
+            <el-form-item label="分类">
+                <el-select v-model="form.type" clearable placeholder="请选择">
+                    <el-option v-for="item in types" :label="item.label" :value="item.value"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="权重">
+                <el-input v-model="form.sort" placeholder="" style="width:60px"></el-input> <span style="color:#808080">数值越大越靠前</span>
+            </el-form-item>
+            <el-form-item label="状态">
+                <el-switch on-text="启用" off-text="停用" v-model="form.state"></el-switch>
+            </el-form-item>
+            <el-form-item>
+                <el-button icon="el-icon-check" type="primary" @@click="onSubmit">提交</el-button>
+                <el-button icon="el-icon-close" onclick="router.push('/system/organs')">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</template>
+<script type="text/javascript">
+    var appList = Vue.extend({
+        template: '#app-list',
+        data: function () { return emptyPager },
+        methods: {
+            refresh() {
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'pager', page: _self.index, rows: _self.size, key: _self.key }, function (rlt) {
+                    _self.message = rlt.message;
+                    _self.total = rlt.total;
+                    _self.index = rlt.index;
+                    _self.size = rlt.size;
+                    _self.rows = rlt.rows;
+                });
+            },
+            search(event) {
+                if (event.keyCode == 13) {
+                    this.refresh()
+                }
+            },
+            sizeChange(val) {
+                emptyPager.size = val;
+                this.refresh();
+            },
+            currentChange(val) {
+                emptyPager.index = val;
+                this.refresh();
+            },
+            handleEdit(row) {
+                router.push('/system/organs/edit?id=' + row.id);
+            },
+            handleDelete(row) {
+                this.$confirm('此操作将永久删除该' + '@Html.Raw(ViewBag.LabelOrgan)', '是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    var _self = this;
+                    $.getJSON(location.pathname, { 'do': 'del', id: row.id }, function (rlt) {
+                        _self.refresh();
+                        app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    });
+                }).catch(() => {
+                    app.$message({ type: 'info', message: '删除操作已取消' });
+                });
+            }
+        }, created() {
+            this.refresh();
+        }
+    })
+    var appForm = Vue.extend({
+        template: '#app-form',
+        data: function () {
+            return {
+                form: {
+                    id: ''
+                    ,
+                    name: ''
+                    ,
+                    fullname: ''
+                    ,
+                    type: ''
+                    ,
+                    sort: ''
+                    ,
+                    state: true
+                },
+                types: @Html.Raw(ViewBag.OrganType)
+            };
+        },
+        methods: {
+            onSubmit: function () {
+                var obj = this.form;
+                $.post(location.pathname + '?do=set', obj, function (rlt) {
+                    app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    if (rlt.success) {
+                        obj.sid = rlt.data;
+                        router.push('/system/organs');
+                    }
+                });
+            }
+        }, created() {
+            var obj = this.form;
+            obj.id = this.getParam('id');
+            if (obj.id) {
+                $.getJSON(location.pathname, { 'do': 'get', id: obj.id }, function (rlt) {
+                    if (rlt.success) {
+                        obj.id = rlt.data.id;
+                        obj.name = rlt.data.name;
+                        obj.fullname = rlt.data.fullname;
+                        obj.type = rlt.data.type;
+                        obj.sort = rlt.data.sort;
+                        obj.state = rlt.data.state == '1';
+                    } else {
+                        app.$message({ type: 'info', message: rlt.message });
+                    }
+                });
+            }
+        }
+    })
+    var router = new VueRouter({
+        mode: 'history', routes: [
+            { path: '/system/organs', component: appList }
+            , { path: '/system/organs/add', component: appForm }
+            , { path: '/system/organs/edit', component: appForm }
+        ]
+    });
+    var app = new Vue({ el: '#app', router: router });
+</script>

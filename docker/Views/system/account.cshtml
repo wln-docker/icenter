@@ -1,0 +1,225 @@
+﻿<style>
+    .el-input-group__append{padding:0 6px}
+</style>
+<div id="app" class="wln"><router-view></router-view></div>
+<template id="app-list">
+    <div>
+        <div class="wln-title">
+            <div style="float:right">
+                <el-button size="mini" type="info" :plain="true" onclick="history.back()">返回</el-button><el-button size="mini" icon="el-icon-plus" type="primary" onclick="router.push('/system/account/add')">新增账号</el-button>
+                <input type="text" v-model="key" :value="key" @@keydown="search($event)" placeholder="按回车键进行查找" />
+            </div>
+            账号管理<span>授权总数：@Html.Raw(ViewBag.wKeyUser)</span>
+        </div>
+        <el-table :data="rows" :empty-text="message" style="width:100%">
+            <el-table-column width="150" property="account" label="帐号"></el-table-column>
+            <el-table-column label="姓名">
+                <template scope="scope">
+                    <el-popover trigger="hover" placement="right">
+                        <p>姓名: {{ scope.row.name }}</p>
+                        <p>职位: {{ scope.row.position }}</p>
+                        <p>工号: {{ scope.row.jobnumber }}</p>
+                        <p>联系电话: {{ scope.row.tel }}</p>
+                        <p>企业邮箱: {{ scope.row.orgemail }}</p>
+                        <div slot="reference" class="name-wrapper">{{ scope.row.name }}</div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <el-table-column></el-table-column>
+            <el-table-column width="100" property="role" align="center" label="授权角色"></el-table-column>
+            <el-table-column width="70" align="center" label="状态">
+                <template scope="scope">
+                    <font v-if="scope.row.state==='1'">正常</font>
+                    <font v-else style="color:#cccccc">停用</font>
+                </template>
+            </el-table-column>
+            <el-table-column width="150" align="center" property="create" label="添加时间"></el-table-column>
+            <el-table-column width="260" label="操作">
+                <template scope="scope">
+                    <el-button size="mini" icon="el-icon-tickets" type="primary" @@click="handlePermission(scope.row)">权限管理</el-button><el-button size="mini" icon="el-icon-edit" type="warning" @@click="handleEdit(scope.row)">编辑</el-button><el-button size="mini" icon="el-icon-delete" type="danger" @@click="handleDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="index" :page-size="size" :total="total"></el-pagination>
+    </div>
+</template>
+<template id="app-form">
+    <div>
+        <div class="wln-title">
+            <div style="float:right">
+                <el-button size="mini" type="info" :plain="true" onclick="history.back()">返回</el-button>
+            </div>
+            账号信息
+        </div>
+        <el-form ref="form" v-model="form" label-width="80px">
+            <el-form-item label="账号">
+                <el-input v-model="form.account" placeholder="推荐使用手机号" style="width:240px"></el-input> <span class="tips notnull"></span>
+            </el-form-item>
+            <el-form-item label="姓名">
+                <el-input v-model="form.name" placeholder="用户的真实姓名" style="width:240px"></el-input> <span class="tips notnull"></span>
+            </el-form-item>
+            <el-form-item label="联系电话">
+                <el-input v-model="form.tel" placeholder="用于通讯录功能" style="width:240px"></el-input> <span class="tips notnull"></span>
+            </el-form-item>
+            <el-form-item label="职位">
+                <el-input v-model="form.position" placeholder="" style="width:240px"></el-input>
+            </el-form-item>
+            <el-form-item label="工号">
+                <el-input v-model="form.jobnumber" placeholder="" style="width:240px"></el-input>
+            </el-form-item>
+            <el-form-item label="个人邮箱">
+                <el-input v-model="form.email" placeholder="" style="width:240px"></el-input>
+            </el-form-item>
+            <el-form-item label="企业邮箱">
+                <el-input v-model="form.orgemail" placeholder="yourname" style="width:240px">
+                    <template slot="append">@@@ViewBag.OrgDomain</template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="授权角色">
+                <el-select v-model="form.role" placeholder="请选择" style="width:240px">
+                    <el-option v-for="item in roles" :label="item.label" :value="item.value"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="状态">
+                <el-switch on-text="启用" off-text="停用" v-model="form.state"></el-switch>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @@click="onSubmit">提交</el-button>
+                <el-button onclick="router.push('/system/account')">返回</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</template>
+<script type="text/javascript">
+    var appList = Vue.extend({
+        template: '#app-list',
+        data: function () { return emptyPager },
+        methods: {
+            refresh() {
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'list', page: _self.index, rows: _self.size, key: _self.key }, function (rlt) {
+                    _self.message = rlt.message;
+                    _self.total = rlt.total;
+                    _self.index = rlt.index;
+                    _self.size = rlt.size;
+                    _self.rows = rlt.rows;
+                });
+            },
+            search(event) {
+                if (event.keyCode == 13) {
+                    this.refresh()
+                }
+            },
+            sizeChange(val) {
+                emptyPager.size = val;
+                this.refresh();
+            },
+            currentChange(val) {
+                emptyPager.index = val;
+                this.refresh();
+            },
+            handlePermission(row) {
+                location.href = '/system/permission?sid=' + row.sid;
+            },
+            handleEdit(row) {
+                router.push('/system/account/edit?sid=' + row.sid);
+            },
+            handleDelete(row) {
+                this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    var _self = this;
+                    $.getJSON(location.pathname, { 'do': 'del', sid: row.sid }, function (rlt) {
+                        _self.refresh();
+                        app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    });
+                }).catch(() => {
+                    app.$message({ type: 'info', message: '删除操作已取消' });
+                });
+            }
+        }, created() {
+            this.refresh();
+        }
+    })
+    var appForm = Vue.extend({
+        template: '#app-form',
+        data: function () {
+            return {
+                form: {
+                    sid: ''
+                    ,
+                    name: ''
+                    ,
+                    account: ''
+                    ,
+                    position: ''
+                    ,
+                    email: ''
+                    ,
+                    role: ''
+                    ,
+                    orgemail: ''
+                    ,
+                    tel: ''
+                    ,
+                    jobnumber: ''
+                    ,
+                    avatar: ''
+                    ,
+                    state: false
+                }
+                , roles: []
+            };
+        },
+        methods: {
+            onSubmit: function () {
+                var obj = this.form;
+                $.post(location.pathname + '?do=set', obj, function (rlt) {
+                    app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    if (rlt.success) {
+                        obj.sid = rlt.data;
+                        router.push('/system/account');
+                    }
+                });
+            }
+        }, created() {
+            _self = this;
+            _self.form.sid = _self.getParam('sid');
+            $.getJSON(location.pathname, { 'do': 'roles' }, function (data) {
+                _self.roles = data;
+            });
+            if (_self.form.sid) {
+                var obj = _self.form;
+                $.getJSON(location.pathname, { 'do': 'get', sid: obj.sid }, function (rlt) {
+                    if (rlt.success) {
+                        obj.sid = rlt.data.sid;
+                        obj.role = rlt.data.role;
+                        obj.name = rlt.data.name;
+                        obj.account = rlt.data.account;
+                        obj.position = rlt.data.position;
+                        obj.tel = rlt.data.tel;
+                        obj.email = rlt.data.email;
+                        obj.orgemail = rlt.data.orgemail;
+                        obj.jobnumber = rlt.data.jobnumber;
+                        obj.state = rlt.data.state == '1';
+                    } else {
+                        app.$message({ type: 'info', message: rlt.message });
+                    }
+                });
+            } else {
+                _self.form.role = 'Member';
+                _self.form.state = true;
+            }
+        }
+    })
+    var router = new VueRouter({
+        mode: 'history', routes: [
+            { path: '/system/account', component: appList }
+            , { path: '/system/account/add', component: appForm }
+            , { path: '/system/account/edit', component: appForm }
+        ]
+    });
+    var app = new Vue({ el: '#app', router: router });
+</script>

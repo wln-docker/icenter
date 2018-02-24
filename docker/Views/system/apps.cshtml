@@ -1,0 +1,85 @@
+﻿<div id="app"><router-view></router-view></div>
+<template id="app-list">
+    <div class="wln">
+        <div class="wln-title">
+            <el-button size="mini" type="primary" onclick="location.href='/system/labels'" style="float:right;">标签名称管理</el-button>
+            @Html.Raw(ViewBag.LabelApp)管理
+        </div>
+        <el-table :data="rows" :empty-text="message">
+            <el-table-column width="50" align="center" type="index"></el-table-column>
+            <el-table-column width="100" align="center" label="@Html.Raw(ViewBag.LabelApp)">
+                <template scope="scope">
+                    <el-popover trigger="hover" placement="right">
+                        <p>服务端: {{ scope.row.host }}</p>
+                        <div slot="reference" class="name-wrapper">{{ scope.row.app }}</div>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <el-table-column width="150" property="name" label="名称"></el-table-column>
+            <el-table-column></el-table-column>
+            <el-table-column width="120" align="center" label="HTTPS">
+                <template scope="scope">
+                    <el-button size="mini" type="info" @@click="handleHttps(scope.row)" v-if="scope.row.https===0">不支持</el-button>
+                    <el-button size="mini" type="primary" @@click="handleHttps(scope.row)" v-else>支持</el-button>
+                </template>
+            </el-table-column>
+            <el-table-column width="150" align="center" label="操作">
+                <template scope="scope">
+                    <el-button size="mini" type="danger" @@click="handleDelete(scope.row)">@Html.Raw("删除" + ViewBag.LabelApp)</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+</template>
+<template id="app-create"></template>
+<script type="text/javascript">
+    var appList = Vue.extend({
+        template: '#app-list',
+        data: function () { return emptyPager },
+        methods: {
+            refresh() {
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'pager', page: _self.index, rows: 999, key: _self.key }, function (rlt) {
+                    _self.message = rlt.message;
+                    _self.total = rlt.total;
+                    _self.index = rlt.index;
+                    _self.size = rlt.size;
+                    _self.rows = rlt.rows;
+                });
+            },
+            handleHttps(row) {
+                var _self = this;
+                $.getJSON(location.pathname, { 'do': 'https', app: row.app }, function (rlt) {
+                    _self.refresh();
+                    app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                });
+            },
+            handleDelete(row) {
+                this.$confirm('@Html.Raw(ViewBag.LabelApp)删除后相关功能将无法使用, 是否继续?', '提示', {
+                    confirmButtonText: '删除',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    var _self = this;
+                    $.getJSON(location.pathname, { 'do': 'del', app: row.app }, function (rlt) {
+                        _self.refresh();
+                        sessionStorage.removeItem('menu');
+                        app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    });
+                }).catch(() => {
+                    app.$message({ type: 'info', message: '删除操作已取消' });
+                });
+            }
+        }, created() {
+            this.refresh();
+        }
+    })
+    var appCreate = Vue.extend({ template: '#app-create' });
+    var router = new VueRouter({
+        mode: 'history', routes: [
+            { path: '/system/apps', component: appList }
+            , { path: '/system/apps/create', component: appCreate }
+        ]
+    });
+    var app = new Vue({ el: '#app', router: router });
+</script>

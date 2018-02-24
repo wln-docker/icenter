@@ -1,0 +1,101 @@
+﻿@{
+    Layout = null;
+}<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>@Html.Raw(ViewBag.SystemName)</title>
+    <meta charset="utf-8" />
+    <meta name="renderer" content="webkit" />
+    <script type="text/javascript" src="//static.wlniao.com/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        var _ua = navigator.userAgent.toLowerCase();
+        if (_ua.indexOf('msie') >= 0 || _ua.indexOf('firefox') >= 0 || _ua.indexOf('opera') >= 0 || _ua.indexOf('chrome') < 0) {
+            document.write('<div style="font-size:12px;color:#333;width:100%;height:40px;line-height:40px;background:#FFC107;text-align:center;">您正在使用浏览器未完全支持本站特性，我们推荐使用以下浏览器： <a href="http://browser.qq.com">QQ浏览器</a> / <a href="http://se.360.cn">360安全浏览器</a> / <a href="http://www.google.com/chrome/?hl=zh-CN">Chrome最新版</a></div>');
+        }
+    </script>
+    <style type="text/css">
+        * {margin:0px;padding:0px;}
+        body {position:fixed;z-index:-1;top:0;right:0;bottom:0;left:0;background:url('@ViewBag.LoginBg') no-repeat;background-size:cover;text-align:center;font-family:"Arial","Microsoft YaHei","黑体","宋体",sans-serif;}
+        .title {font-size:17px;font-weight:400;line-height:24px;margin:0;padding:0 20px;text-align:center;color:#595f69;}
+        a.send {color:#2196F3;font-size:12px;line-height:31px;text-decoration:none;}
+        .main {display:inline-table;margin:60px auto;}
+        .account-container {font-size:14px;position:relative;width:260px;height:280px;margin:20px auto;padding:21px 20px 30px;border-radius:4px;background-color:#fff;box-shadow:0 15px 30px 0 rgba(0,0,1,.1);}
+        .account-container input {line-height:1;width:238px;height:36px;margin:0;padding:0 10px;-webkit-transition:all .25s ease;transition:border .25s ease;text-align:left;color:#3d444f;border:1px solid #ccd1d9;border-radius:2px;outline:0;background-color:#fff;box-shadow:none;}
+        .account-container label {font-size:14px;font-weight:400;line-height:24px;display:block;margin-top:12px;margin-bottom:5px;color:#9ba3af;}
+        .account-container label a {font-size:14px;font-weight:400;line-height:24px;text-decoration:none;color:#9ba3af;float:right;}
+        .header-line {width:120px;height:1px;margin:6px auto 14px;border:0;background-color:#e4e7ed;}
+        .btn {width:100%;height:35px;margin-top:20px;cursor:pointer;border-radius:4px;font:inherit;color:#fff;background:#3890ff;border:1px solid transparent;}
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="account-container sign">
+            <h2 class="title">@Html.Raw(ViewBag.OrganName)</h2>
+            <hr class="header-line">
+            <div style="text-align:left;">
+                <label>帐号: </label><input id="account" type="text" />
+            </div>
+            <div style="text-align:left;margin-top:15px;">
+                <label>密码: </label><input id="password" type="password" onkeypress="KeySubmit()" />
+            </div>
+            <button onclick="DoSubmit();" class="btn">登录</button>
+            <label id="tips"></label>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var ts = 0;
+        var eUid = document.getElementById('account');
+        var ePwd = document.getElementById('password');
+        window.onload = function () {
+            eUid.value = localStorage.getItem("account");
+        }
+        function DoSubmit() {
+            if (new Date().getTime() - ts < 15000) {
+                $('#tips').html('请求正在处理中，请稍候');
+                ePwd.focus();
+            }
+            else if (!eUid.value) {
+                eUid.focus();
+            }
+            else if (!ePwd.value) {
+                ePwd.focus();
+            }
+            else {
+                ts = new Date().getTime();
+                $.getJSON(location.pathname, { "account": eUid.value, "password": ePwd.value }, function (json) {
+                    ts = 0;
+                    if (json.success) {
+                        $('#tips').html(json.message).css({ 'color': 'green' });
+                        sessionStorage.removeItem('menu');
+                        localStorage.setItem("account", eUid.value);
+                        history.replaceState(null, '', '/');
+                        location.reload();
+                    } else {
+                        $('#tips').html(json.message);
+                        if (json.inputid) {
+                            document.getElementById(inputid).focus();
+                        }
+                    }
+                });
+            }
+        }
+        function KeySubmit() {
+            if (event.keyCode == 13) {
+                DoSubmit();
+            }
+        }
+        $(function () {
+            $("#account").focus(function () {
+                $("#account").css("border", "1px solid blue").css("box-shadow", "0 0 3px");
+            }).blur(function () {
+                $("#account").css("border", "1px solid #ccd1d9").css("box-shadow", "0 0 0");
+            });
+            $("#password").focus(function () {
+                $("#password").css("border", "1px solid blue").css("box-shadow", "0 0 3px");
+            }).blur(function () {
+                $("#password").css("border", "1px solid #ccd1d9").css("box-shadow", "0 0 0");
+            });
+        });
+    </script>
+</body>
+</html>

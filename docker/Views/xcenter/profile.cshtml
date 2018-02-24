@@ -1,0 +1,12 @@
+﻿<div style="clear:both;display:block;background-color:#ffffff;margin:10px;padding:10px;">
+    <div  style="display:table;">
+        <div style="display:table-cell;">
+            <img style="width:140px;margin:6px;border-radius:6px;" src="@Html.Raw(ViewBag.Avatar)" />
+        </div>
+        <div style="display:table-cell;vertical-align:top;line-height:27px;padding-left:10px;padding-top:30px;">
+            <p>当前用户：<font style="color:#2196f3;">@Html.Raw(ViewBag.TrueName)</font></p>
+            <p>登录账号：<font style="color:#2196f3;">@Html.Raw(ViewBag.Account)</font></p>
+            <p>员工工号：<font style="color:#2196f3;">@Html.Raw(ViewBag.JobNumber)</font></p>
+        </div>
+    </div>
+</div>
