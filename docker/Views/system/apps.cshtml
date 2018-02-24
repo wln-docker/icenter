@@ -17,10 +17,14 @@
             </el-table-column>
             <el-table-column width="150" property="name" label="名称"></el-table-column>
             <el-table-column></el-table-column>
-            <el-table-column width="120" align="center" label="HTTPS">
+            <el-table-column width="210" align="center" label="HTTPS安全协议">
                 <template scope="scope">
-                    <el-button size="mini" type="info" @@click="handleHttps(scope.row)" v-if="scope.row.https===0">不支持</el-button>
-                    <el-button size="mini" type="primary" @@click="handleHttps(scope.row)" v-else>支持</el-button>
+                    <el-tooltip content="点击开启HTTPS访问" placement="bottom" v-if="scope.row.https===0">
+                        <el-button size="mini" type="info" @@click="handleHttps(scope.row)">未开启</el-button>
+                    </el-tooltip>
+                    <el-tooltip content="点击关闭HTTPS访问" placement="bottom" v-else>
+                        <el-button size="mini" type="primary" @@click="handleHttps(scope.row)">已开启</el-button>
+                    </el-tooltip>
                 </template>
             </el-table-column>
             <el-table-column width="150" align="center" label="操作">
@@ -49,9 +53,17 @@
             },
             handleHttps(row) {
                 var _self = this;
-                $.getJSON(location.pathname, { 'do': 'https', app: row.app }, function (rlt) {
-                    _self.refresh();
-                    app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                this.$confirm((row.https === 0 ? '开启前请确认模块可通过HTTPS地址访问' : '关闭后将可能面临流量劫持等安全问题') + ', 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    $.getJSON(location.pathname, { 'do': 'https', app: row.app }, function (rlt) {
+                        _self.refresh();
+                        app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
+                    });
+                }).catch(() => {
+                    app.$message({ type: 'info', message: '操作已取消' });
                 });
             },
             handleDelete(row) {
