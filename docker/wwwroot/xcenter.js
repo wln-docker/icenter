@@ -1,5 +1,4 @@
-﻿var ts = 0;
-var menuStr = sessionStorage.getItem('menu');
+﻿var menuStr = sessionStorage.getItem('menu');
 if (menuStr) {
     setMenu(JSON.parse(menuStr));
 } else {

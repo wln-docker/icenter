@@ -1,4 +1,5 @@
 ﻿//浏览器兼容
+var ts = 0;
 if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE6.0" || navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE7.0" || navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE8.0") {
     alert("Your browser version is too low, please use IE9 and above or Chrome, Firefox and other browsers!");
 }

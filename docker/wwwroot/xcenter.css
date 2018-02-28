@@ -48,6 +48,9 @@ a:hover,a:focus {opacity:0.8}
 .wln-subtitle {border-left:2px solid #0099cc;font-size:20px;padding-left:6px;margin:6px 0px}
 .wln-title button,.wln-subtitle button{vertical-align:middle;}
 .wln-title .el-button--small,.wln-subtitle .el-button--small {line-height:16px;vertical-align:middle;}
+
+.tips{color:#999999;}.tips::before{content:'*';color:#999999;margin-left:8px;font-family:cursive;vertical-align:bottom;padding-right:3px;}
+.tips.notnull::before{color:#FF5722;}
 .el-table .cell{padding-left:3px;padding-right:3px;}.el-table .cell,.el-select-dropdown__item {font-family:monospace;}
 .el-button + .el-button {margin-left:1px;}
 .el-button--mini {min-width:58px;padding:5px 7px 2px 5px;font-size:13px;line-height:16px;}
