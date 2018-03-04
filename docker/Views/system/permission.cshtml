@@ -22,7 +22,8 @@
     </el-dialog>
 </div>
 <template id="app-permission">
-    <el-table :data="rows" :empty-text="message" style="width:100%">
+    <el-table :data="rows" :empty-text="message" @@filter-change="filterChange" style="width:100%">
+        <el-table-column width="120" align="center" label="@Html.Raw("所属"+ViewBag.LabelApp)" property="app" column-key="app" :filters="apps" :filter-multiple="false"></el-table-column>
         <el-table-column width="150" property="name" label="权限名称"></el-table-column>
         <el-table-column property="description" label="权限说明"></el-table-column>
         <el-table-column width="200" label="操作" align="center">
@@ -50,6 +51,12 @@
 </template>
 <script type="text/javascript">
     $('#app').height($(window).height() - 70);
+    var apps = [];
+    $.ajax({
+        url: '/system/apps?do=filters', dataType: "json", async: false, success: function (data) {
+            apps = data;
+        }
+    });
     function Change(code) {
         if (new Date().getTime() - ts < 10000) {
             return app.$message({ type: 'info', message: '请求正在处理中，请稍候' });
@@ -98,6 +105,8 @@
         });
     }
     function topage(to, organ) {
+        emptyPager.total = 0;
+        emptyPager.index = 1;
         emptyPager.rows = [];
         emptyPager.type = to;
         emptyPager.organ = organ;
@@ -117,13 +126,24 @@
             refresh() {
                 var _self = this;
                 this.message = '正在加载角色权限数据';
-                $.getJSON(location.pathname, { 'do': 'authority', page: 1, rows: 1000, sid: emptyPager.sid, organ: emptyPager.organ, type: emptyPager.type, key: emptyPager.key }, function (rlt) {
+                $.getJSON(location.pathname, { 'do': 'authority', page: 1, rows: 1000, sid: emptyPager.sid, organ: emptyPager.organ, app: emptyPager.app, type: emptyPager.type, key: emptyPager.key }, function (rlt) {
                     emptyPager.message = rlt.message;
                     emptyPager.total = rlt.total;
                     emptyPager.index = rlt.index;
                     emptyPager.size = rlt.size;
                     emptyPager.rows = rlt.rows;
                 });
+            },
+            filterChange(filters) {
+                emptyPager.total = 0;
+                emptyPager.index = 1;
+                emptyPager.rows = [];
+                if (filters.app && filters.app.length > 0) {
+                    emptyPager.app = filters.app[0];
+                } else {
+                    emptyPager.app = '';
+                }
+                this.refresh();
             }
         }, created() {
             this.refresh();
