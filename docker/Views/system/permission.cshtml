@@ -120,6 +120,8 @@
     var appPermission = Vue.extend({
         template: '#app-permission',
         data: function () {
+            emptyPager.app = '';
+            emptyPager.apps = apps;
             return emptyPager
         },
         methods: {

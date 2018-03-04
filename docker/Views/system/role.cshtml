@@ -74,7 +74,8 @@
                 <el-button size="mini" type="primary" @@click="topage(2)" v-if="roletype==1"><svg class="icon"><use v-bind:xlink:href="'#icon-organ'"></use></svg> @Html.Raw(ViewBag.LabelOrgan)权限</el-button>
             </el-button-group>
         </div>
-        <el-table :data="rows" :empty-text="message" style="width:100%">
+        <el-table :data="rows" :empty-text="message" @@filter-change="filterChange" style="width:100%">
+            <el-table-column width="120" align="center" label="@Html.Raw("所属"+ViewBag.LabelApp)" property="app" column-key="app" :filters="apps" :filter-multiple="false"></el-table-column>
             <el-table-column width="210" property="name" label="权限名称"></el-table-column>
             <el-table-column property="description" label="权限说明"></el-table-column>
             <el-table-column width="180" label="操作" align="center">
@@ -87,6 +88,12 @@
     </div>
 </template>
 <script type="text/javascript">
+    var apps = [];
+    $.ajax({
+        url: '/system/apps?do=filters', dataType: "json", async: false, success: function (data) {
+            apps = data;
+        }
+    });
     var appList = Vue.extend({
         template: '#app-list',
         data: function () { return emptyPager },
@@ -225,6 +232,8 @@
     var appPermission = Vue.extend({
         template: '#app-permission',
         data: function () {
+            emptyPager.app = '';
+            emptyPager.apps = apps;
             emptyPager.type = 0;
             emptyPager.code = '';
             emptyPager.roletype = 0;
@@ -233,13 +242,24 @@
         methods: {
             refresh() {
                 var _self = this;
-                $.getJSON(location.pathname, { 'do': 'authority', page: 1, rows: 1000, code: _self.code, type: _self.type, key: _self.key }, function (rlt) {
+                $.getJSON(location.pathname, { 'do': 'authority', page: 1, rows: 1000, code: _self.code, app: _self.app, type: _self.type, key: _self.key }, function (rlt) {
                     _self.message = rlt.message;
                     _self.total = rlt.total;
                     _self.index = rlt.index;
                     _self.size = rlt.size;
                     _self.rows = rlt.rows;
                 });
+            },
+            filterChange(filters) {
+                emptyPager.total = 0;
+                emptyPager.index = 1;
+                emptyPager.rows = [];
+                if (filters.app && filters.app.length > 0) {
+                    emptyPager.app = filters.app[0];
+                } else {
+                    emptyPager.app = '';
+                }
+                this.refresh();
             },
             goback() {
                 this.total = 0;
