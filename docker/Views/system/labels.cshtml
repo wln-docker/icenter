@@ -25,10 +25,10 @@
         methods: {
             refresh() {
                 var _self = this;
-                $.getJSON(location.pathname, { 'do': 'pager', page: _self.index, rows: 999, key: _self.key }, function (rlt) {
+                $.getJSON(location.pathname, { 'do': 'pager', page: _self.page, rows: 999, key: _self.key }, function (rlt) {
                     _self.message = rlt.message;
                     _self.total = rlt.total;
-                    _self.index = rlt.index;
+                    _self.page = rlt.page;
                     _self.size = rlt.size;
                     _self.rows = rlt.rows;
                 });

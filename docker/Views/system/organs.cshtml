@@ -30,7 +30,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="index" :page-size="size" :total="total"></el-pagination>
+        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="page" :page-size="size" :total="total"></el-pagination>
     </div>
 </template>
 <template id="app-form">
@@ -73,10 +73,10 @@
         methods: {
             refresh() {
                 var _self = this;
-                $.getJSON(location.pathname, { 'do': 'pager', page: _self.index, rows: _self.size, key: _self.key }, function (rlt) {
+                $.getJSON(location.pathname, { 'do': 'pager', page: _self.page, rows: _self.size, key: _self.key }, function (rlt) {
                     _self.message = rlt.message;
                     _self.total = rlt.total;
-                    _self.index = rlt.index;
+                    _self.page = rlt.page;
                     _self.size = rlt.size;
                     _self.rows = rlt.rows;
                 });
@@ -91,7 +91,7 @@
                 this.refresh();
             },
             currentChange(val) {
-                emptyPager.index = val;
+                emptyPager.page = val;
                 this.refresh();
             },
             handleEdit(row) {

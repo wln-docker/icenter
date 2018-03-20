@@ -106,7 +106,7 @@
     }
     function topage(to, organ) {
         emptyPager.total = 0;
-        emptyPager.index = 1;
+        emptyPager.page = 1;
         emptyPager.rows = [];
         emptyPager.type = to;
         emptyPager.organ = organ;
@@ -131,14 +131,14 @@
                 $.getJSON(location.pathname, { 'do': 'authority', page: 1, rows: 1000, sid: emptyPager.sid, organ: emptyPager.organ, app: emptyPager.app, type: emptyPager.type, key: emptyPager.key }, function (rlt) {
                     emptyPager.message = rlt.message;
                     emptyPager.total = rlt.total;
-                    emptyPager.index = rlt.index;
+                    emptyPager.page = rlt.page;
                     emptyPager.size = rlt.size;
                     emptyPager.rows = rlt.rows;
                 });
             },
             filterChange(filters) {
                 emptyPager.total = 0;
-                emptyPager.index = 1;
+                emptyPager.page = 1;
                 emptyPager.rows = [];
                 if (filters.app && filters.app.length > 0) {
                     emptyPager.app = filters.app[0];

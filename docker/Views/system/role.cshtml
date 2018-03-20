@@ -34,7 +34,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="index" :page-size="size" :total="total"></el-pagination>
+        <el-pagination @@size-change="sizeChange" @@current-change="currentChange" layout="total, sizes, prev, pager, next, jumper" :current-page="page" :page-size="size" :total="total"></el-pagination>
     </div>
 </template>
 <template id="app-form">
@@ -100,10 +100,10 @@
         methods: {
             refresh() {
                 var _self = this;
-                $.getJSON(location.pathname, { 'do': 'list', page: _self.index, rows: _self.size, key: _self.key }, function (rlt) {
+                $.getJSON(location.pathname, { 'do': 'list', page: _self.page, rows: _self.size, key: _self.key }, function (rlt) {
                     _self.message = rlt.message;
                     _self.total = rlt.total;
-                    _self.index = rlt.index;
+                    _self.page = rlt.page;
                     _self.size = rlt.size;
                     _self.rows = rlt.rows;
                 });
@@ -118,7 +118,7 @@
                 this.refresh();
             },
             currentChange(val) {
-                emptyPager.index = val;
+                emptyPager.page = val;
                 this.refresh();
             },
             tableRowClassName({ row, rowIndex }) {
@@ -245,14 +245,14 @@
                 $.getJSON(location.pathname, { 'do': 'authority', page: 1, rows: 1000, code: _self.code, app: _self.app, type: _self.type, key: _self.key }, function (rlt) {
                     _self.message = rlt.message;
                     _self.total = rlt.total;
-                    _self.index = rlt.index;
+                    _self.page = rlt.page;
                     _self.size = rlt.size;
                     _self.rows = rlt.rows;
                 });
             },
             filterChange(filters) {
                 emptyPager.total = 0;
-                emptyPager.index = 1;
+                emptyPager.page = 1;
                 emptyPager.rows = [];
                 if (filters.app && filters.app.length > 0) {
                     emptyPager.app = filters.app[0];
@@ -263,7 +263,7 @@
             },
             goback() {
                 this.total = 0;
-                this.index = 1;
+                this.page = 1;
                 this.size = 10;
                 this.rows = [];
                 router.push('/system/role');
