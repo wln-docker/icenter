@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "0291286ae859e192e328c7f4634b128b1474508f"
+    "signature": "61345abfc17df36a1b610fb2f7ab6be05e698ecd"
   },
   "compilationOptions": {
     "defines": [
@@ -26,7 +26,7 @@
           "Microsoft.NETCore.App": "2.0.0",
           "Pomelo.EntityFrameworkCore.MySql": "2.0.1",
           "SharpZipLib.NETStandard": "1.0.7",
-          "Wlniao.XCore": "2.0.8",
+          "Wlniao.XCore": "2.1.2",
           "Wlniao.XCore.Aliyun": "2.0.2"
         },
         "runtime": {
@@ -2670,7 +2670,7 @@
           "System.Xml.XPath": "4.3.0"
         }
       },
-      "Wlniao.XCore/2.0.8": {
+      "Wlniao.XCore/2.1.2": {
         "dependencies": {
           "Microsoft.AspNetCore": "2.0.2",
           "Microsoft.AspNetCore.Hosting": "2.0.2",
@@ -2701,7 +2701,7 @@
       },
       "Wlniao.XCore.Aliyun/2.0.2": {
         "dependencies": {
-          "Wlniao.XCore": "2.0.8",
+          "Wlniao.XCore": "2.1.2",
           "protobuf-net": "2.3.3"
         },
         "runtime": {
@@ -4393,17 +4393,17 @@
       "path": "system.xml.xpath.xdocument/4.3.0",
       "hashPath": "system.xml.xpath.xdocument.4.3.0.nupkg.sha512"
     },
-    "Wlniao.XCore/2.0.8": {
+    "Wlniao.XCore/2.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-FYYUJ00+OA29DKFUB5AH8P91GiwdeIEUAQsx1LNe/Yp9SZJsJSiBtNZPBGuix0mhUxDbyQ2R9Q0549UBSKU9rw==",
-      "path": "wlniao.xcore/2.0.8",
-      "hashPath": "wlniao.xcore.2.0.8.nupkg.sha512"
+      "sha512": "sha512-MXx8EIL1viX3g+d7B9qHDVCXLmPecN7YT90k5nV2yzKjO31W3fTJzP5Rd4LvuX2ekgTpWjvxD8g1iNO56N5DVg==",
+      "path": "wlniao.xcore/2.1.2",
+      "hashPath": "wlniao.xcore.2.1.2.nupkg.sha512"
     },
     "Wlniao.XCore.Aliyun/2.0.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-kEd5VNEuWGJIal/9xfSxwZcVe46laWyt18VhXjhr/LO2ef8Ra18fRhDl/3eKHOl4Eu0KtvGzZEVa30k4KPBHJA==",
+      "sha512": "sha512-nMaT4QuJsEkJGqze8laMuSLOAWJyLMwUyEkNt1PFqQJmkMbWGD7gaUA74L9QLs6k4iPiY8wR76E8RmWMdhXqwg==",
       "path": "wlniao.xcore.aliyun/2.0.2",
       "hashPath": "wlniao.xcore.aliyun.2.0.2.nupkg.sha512"
     },

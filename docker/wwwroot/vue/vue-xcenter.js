@@ -1,9 +1,10 @@
 ﻿//浏览器兼容
 var ts = 0;
-if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE6.0" || navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE7.0" || navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") == "MSIE8.0") {
-    alert("Your browser version is too low, please use IE9 and above or Chrome, Firefox and other browsers!");
+var _ua = navigator.userAgent.toLowerCase();
+if (_ua.indexOf('msie') >= 0 || _ua.indexOf('opera') >= 0 || _ua.indexOf('chrome') < 0) {
+	document.write('<div style="font-size:12px;color:#333;width:100%;height:40px;line-height:40px;background:#FFC107;text-align:center;position:absolute;z-index:999;top:0;">您正在使用浏览器未完全支持本系统特性，我们推荐使用以下浏览器： <a href="http://browser.qq.com">QQ浏览器</a> / <a href="http://se.360.cn">360安全浏览器</a> / <a href="http://www.google.com/chrome/?hl=zh-CN">Chrome最新版</a></div>');
 }
-var emptyPager = { size: 10, page: 1, index: 1, total: 0, rows: [], list: [], key: '', message: '数据加载中', loading: false };
+var pager = emptyPager = { size: 10, page: 1, total: 0, rows: [], list: [], key: '', message: '数据加载中', loading: false, index: 1 };
 Vue.prototype.getParam = (key) => {
     var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
     var r = window.location.search.substr(1).match(reg);
@@ -72,36 +73,64 @@ Vue.prototype.htmlDecode = (str) => {
     s = s.replace(/&quot;/g, "\"");
     return s;
 }
+//日期格式化
 Date.prototype.pattern = function (fmt) {
-    var o = {
-        "M+": this.getMonth() + 1, //月份           
-        "d+": this.getDate(), //日           
-        "h+": this.getHours() % 12 == 0 ? 12 : this.getHours() % 12, //小时           
-        "H+": this.getHours(), //小时           
-        "m+": this.getMinutes(), //分           
-        "s+": this.getSeconds(), //秒           
-        "q+": Math.floor((this.getMonth() + 3) / 3), //季度           
-        "S": this.getMilliseconds() //毫秒           
-    };
-    var week = {
-        "0": "/u65e5",
-        "1": "/u4e00",
-        "2": "/u4e8c",
-        "3": "/u4e09",
-        "4": "/u56db",
-        "5": "/u4e94",
-        "6": "/u516d"
-    };
-    if (/(y+)/.test(fmt)) {
-        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    }
-    if (/(E+)/.test(fmt)) {
-        fmt = fmt.replace(RegExp.$1, ((RegExp.$1.length > 1) ? (RegExp.$1.length > 2 ? "/u661f/u671f" : "/u5468") : "") + week[this.getDay() + ""]);
-    }
-    for (var k in o) {
-        if (new RegExp("(" + k + ")").test(fmt)) {
-            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-        }
-    }
-    return fmt;
-}  
+	var o = {
+		"M+": this.getMonth() + 1, //月份           
+		"d+": this.getDate(), //日           
+		"h+": this.getHours() % 12 == 0 ? 12 : this.getHours() % 12, //小时           
+		"H+": this.getHours(), //小时           
+		"m+": this.getMinutes(), //分           
+		"s+": this.getSeconds(), //秒           
+		"q+": Math.floor((this.getMonth() + 3) / 3), //季度           
+		"S": this.getMilliseconds() //毫秒           
+	};
+	var week = {
+		"0": "/u65e5",
+		"1": "/u4e00",
+		"2": "/u4e8c",
+		"3": "/u4e09",
+		"4": "/u56db",
+		"5": "/u4e94",
+		"6": "/u516d"
+	};
+	if (/(y+)/.test(fmt)) {
+		fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+	}
+	if (/(E+)/.test(fmt)) {
+		fmt = fmt.replace(RegExp.$1, ((RegExp.$1.length > 1) ? (RegExp.$1.length > 2 ? "/u661f/u671f" : "/u5468") : "") + week[this.getDay() + ""]);
+	}
+	for (var k in o) {
+		if (new RegExp("(" + k + ")").test(fmt)) {
+			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+		}
+	}
+	return fmt;
+}
+//字符串格式化
+String.prototype.format = function () {
+	var args = arguments;
+	return this.replace(/\{(\d+)\}/g, function (m, i, o, n) {
+		return args[i];
+	});
+}
+//字符串尾部
+String.prototype.endWith = function (str) {
+	if (str == null || str == "" || this.length == 0 || str.length > this.length)
+		return false;
+	if (this.substring(this.length - str.length) == str)
+		return true;
+	else
+		return false;
+	return true;
+}
+//字符串头部
+String.prototype.startWith = function (str) {
+	if (str == null || str == "" || this.length == 0 || str.length > this.length)
+		return false;
+	if (this.substr(0, str.length) == str)
+		return true;
+	else
+		return false;
+	return true;
+}
