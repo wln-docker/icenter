@@ -60,7 +60,7 @@ function JsAPI() {
             var _path = Vue.prototype.getCookie('path');
             Vue.prototype.delCookie('path');
             if (_path) {
-				_path = '/' + decodeURIComponent(_path);
+                _path = '/' + decodeURIComponent(decodeURI(_path));
                 history.replaceState(null, '', _path);
             }
         }
