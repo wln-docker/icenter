@@ -11,7 +11,7 @@
                 <el-button plain size="mini" type="info" @@click="location.href='/system/role'"><svg class="icon"><use v-bind:xlink:href="'#icon-left'"></use></svg></el-button>
                 <el-button v-bind:plain="emptyPager.type!==0" size="mini" type="primary" @@click="topage(0,'')"><svg class="icon"><use v-bind:xlink:href="'#icon-setting'"></use></svg> 系统权限</el-button>
                 <el-button v-bind:plain="emptyPager.type!==1" size="mini" type="primary" @@click="topage(1,'')"><svg class="icon"><use v-bind:xlink:href="'#icon-apps'"></use></svg> 业务权限</el-button>
-                <el-button v-bind:plain="emptyPager.type!==2" size="mini" type="primary" @@click="topage(2,'')"><svg class="icon"><use v-bind:xlink:href="'#icon-organ'"></use></svg> @Html.Raw(ViewBag.LabelOrgan)权限</el-button>
+                @if(ViewBag.MoreOrgans){<el-button v-bind:plain="emptyPager.type!==2" size="mini" type="primary" @@click="topage(2,'')"><svg class="icon"><use v-bind:xlink:href="'#icon-organ'"></use></svg> @Html.Raw(ViewBag.LabelOrgan)权限</el-button>}
             </el-button-group>
         </div>
         <el-table :data="rows" :empty-text="message" @@filter-change="filterChange" style="width:100%">
@@ -169,7 +169,7 @@
                     ,
                     text: ''
                 },
-                types: [{ value: 0, label: '系统权限', text: '系统管理的操作权限' }, { value: 1, label: '模块权限', text: '业务模块的操作权限' }, { value: 2, label: '@Html.Raw(ViewBag.LabelOrgan)权限', text: '根据' +'@Html.Raw(ViewBag.LabelOrgan)分配的权限' }]
+                types: [{ value: 0, label: '系统权限', text: '系统管理的操作权限' }, { value: 1, label: '模块权限', text: '业务模块的操作权限' }]@if (ViewBag.MoreOrgans) {<text>.concat([{ value: 2, label: '@Html.Raw(ViewBag.LabelOrgan)权限', text: '根据' +'@Html.Raw(ViewBag.LabelOrgan)分配的权限' }])</text>}
             };
         },
         methods: {

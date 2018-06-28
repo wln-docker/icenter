@@ -17,12 +17,13 @@
         </div>
         <el-table :data="rows" :row-class-name="tableRowClassName" :empty-text="message" style="width:100%">
             <el-table-column width="150" property="name" label="名称"></el-table-column>
-            <el-table-column width="90" label="类型">
+            @if (ViewBag.MoreOrgans) {<el-table-column width="90" label="类型">
                 <template scope="scope">
                     <font v-if="scope.row.type===1">@Html.Raw(ViewBag.LabelOrgan)角色</font>
                     <font v-else>基础角色</font>
                 </template>
-            </el-table-column>
+            </el-table-column>}
+
             <el-table-column width="100" property="code" label="编码"></el-table-column>
             <el-table-column width="80" property="count" label="用户数" align="center"></el-table-column>
             <el-table-column></el-table-column>
@@ -49,11 +50,12 @@
             <el-form-item label="角色编码">
                 <el-input v-model="form.code" placeholder="必填" style="width:320px" :disabled="form.editcode.length > 0"></el-input><span class="tips notnull"></span>
             </el-form-item>
-            <el-form-item label="角色类型">
+            @if (ViewBag.MoreOrgans) {<el-form-item label="角色类型">
                 <el-select v-model="form.type" @@change="typeChange" placeholder="请选择" style="width:120px">
                     <el-option v-for="item in types" :label="item.label" :value="item.value"></el-option>
                 </el-select> {{form.text}}
-            </el-form-item>
+            </el-form-item>}
+
             <el-form-item>
                 <el-button icon="el-icon-check" type="primary" @@click="onSubmit">提交</el-button>
                 <el-button icon="el-icon-close" onclick="router.push('/system/role')">取消</el-button>
@@ -71,7 +73,7 @@
                 <el-button size="mini" plain type="info" @@click="goback()"><svg class="icon"><use v-bind:xlink:href="'#icon-left'"></use></svg> 返回</el-button>
                 <el-button size="mini" v-bind:plain="type!==0" type="primary" @@click="topage(0)" v-if="roletype==0"><svg class="icon"><use v-bind:xlink:href="'#icon-setting'"></use></svg> 系统权限</el-button>
                 <el-button size="mini" v-bind:plain="type!==1" type="primary" @@click="topage(1)" v-if="roletype==0"><svg class="icon"><use v-bind:xlink:href="'#icon-apps'"></use></svg> 业务权限</el-button>
-                <el-button size="mini" type="primary" @@click="topage(2)" v-if="roletype==1"><svg class="icon"><use v-bind:xlink:href="'#icon-organ'"></use></svg> @Html.Raw(ViewBag.LabelOrgan)权限</el-button>
+                @if (ViewBag.MoreOrgans) {<el-button size="mini" v-bind:plain="type!==2" type="primary" @@click="topage(2)" v-if="roletype==1"><svg class="icon"><use v-bind:xlink:href="'#icon-organ'"></use></svg> @Html.Raw(ViewBag.LabelOrgan)权限</el-button>}
             </el-button-group>
         </div>
         <el-table :data="rows" :empty-text="message" @@filter-change="filterChange" style="width:100%">
@@ -168,13 +170,14 @@
                     ,
                     name: ''
                     ,
-                    type: 1
+                    type: 0
                     ,
                     editcode: ''
                     ,
                     text: ''
                 },
-                types: [{ value: 0, label: '基础角色', text: '用户账号的基础角色及权限' }, { value: 1, label: '@Html.Raw(ViewBag.LabelOrgan)角色', text: '用户在各' + '@Html.Raw(ViewBag.LabelOrgan)中的角色及权限' }]
+                types: [{ value: 0, label: '基础角色', text: '用户账号的基础角色及权限' }]@if (ViewBag.MoreOrgans) {<text>.concat([{ value: 1, label: '@Html.Raw(ViewBag.LabelOrgan)角色', text: '用户在各' + '@Html.Raw(ViewBag.LabelOrgan)中的角色及权限' }])</text>}
+
             };
         },
         methods: {
