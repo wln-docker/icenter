@@ -47,7 +47,7 @@ a:hover,a:focus {opacity:0.8}
 .wln-title .el-input__inner {height:28px;padding-left:12px;}.wln-title .el-input__suffix{line-height:28px;}.wln-title input[type=text]{line-height:28px}
 .wln-subtitle {border-left:2px solid #0099cc;font-size:20px;padding-left:6px;margin:6px 0px}
 .wln-title button,.wln-subtitle button{vertical-align:middle;}
-.wln-title .el-button--small,.wln-subtitle .el-button--small{line-height:16px;vertical-align:middle;}
+.wln-title .el-button--small,.wln-subtitle .el-button--small{padding:7px 12px;line-height:14px;vertical-align:middle;}
 
 .tips{color:#999999;}.tips::before{content:'*';color:#999999;margin-left:8px;font-family:cursive;vertical-align:bottom;padding-right:3px;}
 .tips.notnull::before{color:#FF5722;}
