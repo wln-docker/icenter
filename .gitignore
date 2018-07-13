@@ -1,5 +1,6 @@
 ﻿*.dg
 *.log
+*.pid
 *.user
 *.wkey
 /app

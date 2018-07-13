@@ -15,14 +15,7 @@
             </el-button-group>
         </div>
         <el-table :data="rows" :empty-text="message" @@filter-change="filterChange" style="width:100%">
-            @*<el-table-column width="90" label="类型">
-                <template scope="scope">
-                    <font v-if="scope.row.type===2">@Html.Raw(ViewBag.LabelOrgan)权限</font>
-                    <font v-else-if="scope.row.type===1">模块权限</font>
-                    <font v-else>系统权限</font>
-                </template>
-            </el-table-column>*@
-            <el-table-column width="120" align="center" label="@Html.Raw("所属"+ViewBag.LabelApp)" property="app" column-key="app" :filters="apps" :filter-multiple="false"></el-table-column>
+            <el-table-column width="120" align="center" label="@Html.Raw("所属"+ViewBag.LabelApp)" property="appname" column-key="app" :filters="apps" :filter-multiple="false"></el-table-column>
             <el-table-column width="150" property="name" label="权限名称"></el-table-column>
             <el-table-column property="description" label="权限说明"></el-table-column>
             <el-table-column width="220" property="code" label="编码"></el-table-column>
@@ -127,7 +120,7 @@
                 router.push('/system/authority/edit?code=' + row.code);
             },
             handleDelete(row) {
-                this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+                this.$confirm('此操作将删除该权限点, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -139,7 +132,7 @@
                         ts = new Date().getTime();
                     }
                     var _self = this;
-                    $.getJSON(location.pathname, { 'do': 'del', code: row.code }, function (rlt) {
+                    $.getJSON(location.pathname, { 'do': 'del', code: row.code, app: row.app }, function (rlt) {
                         ts = 0;
                         _self.refresh();
                         app.$message({ type: rlt.success ? 'success' : 'error', message: rlt.message });
