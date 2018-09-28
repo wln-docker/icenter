@@ -1,2 +1,2 @@
-FROM wlniao/dotnet:2.0.0
+FROM wlniao/dotnet:2.1.2
 ENTRYPOINT ["dotnet", "icenter.dll"]
