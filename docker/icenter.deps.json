@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "ba1522fafe583d135ad535e69db25e2c4a6671af"
+    "signature": "99935190f512724c3b6e38c0bb057025a7ac585b"
   },
   "compilationOptions": {
     "defines": [
@@ -29,7 +29,7 @@
           "Pomelo.EntityFrameworkCore.MySql": "2.1.2",
           "SharpZipLib.NETStandard": "1.0.7",
           "Wlniao.XCore": "2.1.13",
-          "Wlniao.XCore.Aliyun": "2.0.2"
+          "Wlniao.XCore.Aliyun": "2.0.3"
         },
         "runtime": {
           "icenter.dll": {}
@@ -2920,15 +2920,15 @@
           "lib/netcoreapp2.0/Wlniao.XCore.dll": {}
         }
       },
-      "Wlniao.XCore.Aliyun/2.0.2": {
+      "Wlniao.XCore.Aliyun/2.0.3": {
         "dependencies": {
           "Wlniao.XCore": "2.1.13",
           "protobuf-net": "2.3.3"
         },
         "runtime": {
           "lib/netcoreapp2.0/Wlniao.XCore.Aliyun.dll": {
-            "assemblyVersion": "2.0.2.0",
-            "fileVersion": "2.0.2.0"
+            "assemblyVersion": "2.0.3.0",
+            "fileVersion": "2.0.3.0"
           }
         },
         "compile": {
@@ -4550,12 +4550,12 @@
       "path": "wlniao.xcore/2.1.13",
       "hashPath": "wlniao.xcore.2.1.13.nupkg.sha512"
     },
-    "Wlniao.XCore.Aliyun/2.0.2": {
+    "Wlniao.XCore.Aliyun/2.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-nMaT4QuJsEkJGqze8laMuSLOAWJyLMwUyEkNt1PFqQJmkMbWGD7gaUA74L9QLs6k4iPiY8wR76E8RmWMdhXqwg==",
-      "path": "wlniao.xcore.aliyun/2.0.2",
-      "hashPath": "wlniao.xcore.aliyun.2.0.2.nupkg.sha512"
+      "sha512": "sha512-ikK4Zi+s8smpfbW118AiXBBW9FC4I6wZYNTkXX6D488YBdQLiHzTGYr+UnbFgXCJ0+yDF1gUdeKN7uDA1ByaZQ==",
+      "path": "wlniao.xcore.aliyun/2.0.3",
+      "hashPath": "wlniao.xcore.aliyun.2.0.3.nupkg.sha512"
     },
     "Microsoft.NETCore.App/2.0.0": {
       "type": "package",
